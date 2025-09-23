@@ -33,9 +33,11 @@ The study in the “Learning to Prompt for Vision-Language Models” paper [3] i
 
 To mitigate this, the paper proposes a new method called Context Optimization (CoOp). This is a prompt learning method that replaces hand-crafted prompts, as in the  CLIP mode, with learnable tokens optimized for classification tasks. Its primary goal is to automate and improve prompt learning.  It shows high performance compared to CLIP, as illustrated in Figure 2.
 
-<center><img alt="image" src="https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f" /></center>
-
-Figure 2:Prompt engineering vs Context Optimization (CoOp)[3]. 
+<p align="center">
+<img alt="image" src="https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f" />
+  <br>
+  <em>Figure 2:Prompt engineering vs Context Optimization (CoOp)[3]. </em>
+</p>
 
 The paper illustrates that, while CoOp improves performance, the prompts are not human-readable, making them harder to debug, more prone to overfitting, and strongly tied to the trained model, which makes CoOp sensitive to noisy labels. 
 
