@@ -2,15 +2,17 @@
 
 ## Project Metadata
 ### Authors
-- **Team:** Name1, Namw2
+- **Team:** Aishah Altamimi
 - **Supervisor Name:** Dr. Muzammil Behzad
-- **Affiliations:** SABIC, ARAMCO and KFUPM (write your institution name, and/or KFUPM)
+- **Affiliations:** SABIC, ARAMCO, KFUPM, AIU
 
 ## Introduction
 Write 1-2 technical paragraphs (feel free to add images if you would like).
 
 ## Problem Statement
-Write 1-2 technical paragraphs (feel free to add images if you would like).
+Vision Language Model are models that integrate visual and textual modalities to perform tasks and enabling sophisticated applications like visual question answering, image captioning, and visual reasoning [1]. 
+
+Recent advances in VLM includes Contrastive Language-Image Pretraining (CLIP) and Context Optimization (CoOp) models. CLIP is a zero-shot vision–language model learns to match images with text rather than rely only on class name. It turns an image into a vector of numbers and a text prompt into another vector, then checks how similar those vectors are. This makes the model relies on prompt templates like “a photo of a {}.” instead of simply using a class name in image classification tasks. Which makes the model very sensitive to the structure of prompt templates [2]. To mitigate this limitation, a CoOp has proposed, which is a few-shot prompt learning method that replaces CLIP’s hand-crafted prompts with learnable tokens optimized for specific tasks [3].CoOp  shows high performance with correctly crafted prompts compared to CLIP. 
 
 ## Application Area and Project Domain
 Write 1-2 technical paragraphs (feel free to add images if you would like).
