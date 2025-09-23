@@ -7,7 +7,7 @@
 - **Affiliations:** SABIC, ARAMCO, KFUPM, IAU
 
 ## Introduction
-<p align="justify">
+<p style="line-height:1.15;" align="justify">
  Vision Language Models are models that integrate visual and textual modalities to perform tasks and enable sophisticated applications like visual question answering, image captioning, and visual reasoning [1]. 
 
 Recent advances in VLM include Contrastive Language-Image Pretraining (CLIP) and Context Optimization (CoOp) models. CLIP is a zero-shot vision–language model that learns to match images with text rather than relying only on class names. It turns an image into a vector of numbers and a text prompt into another vector, then checks how similar those vectors are. This makes the model rely on prompt templates like “a photo of a {}.” instead of simply using a class name in image classification tasks. This makes the model very sensitive to the structure of prompt templates [2]. To mitigate this limitation, a CoOp has proposed a few-shot prompt learning method that replaces CLIP’s hand-crafted prompts with learnable tokens optimized for specific tasks [3].CoOp  shows high performance with correctly crafted prompts compared to CLIP.
