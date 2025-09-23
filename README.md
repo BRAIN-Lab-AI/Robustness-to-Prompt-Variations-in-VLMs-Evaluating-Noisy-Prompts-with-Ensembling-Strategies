@@ -7,23 +7,31 @@
 - **Affiliations:** SABIC, ARAMCO, KFUPM, IAU
 
 ## Introduction
-Vision Language Models are models that integrate visual and textual modalities to perform tasks and enable sophisticated applications like visual question answering, image captioning, and visual reasoning [1]. 
+<p align="justify">
+ Vision Language Models are models that integrate visual and textual modalities to perform tasks and enable sophisticated applications like visual question answering, image captioning, and visual reasoning [1]. 
 
-Recent advances in VLM include Contrastive Language-Image Pretraining (CLIP) and Context Optimization (CoOp) models. CLIP is a zero-shot vision–language model that learns to match images with text rather than relying only on class names. It turns an image into a vector of numbers and a text prompt into another vector, then checks how similar those vectors are. This makes the model rely on prompt templates like “a photo of a {}.” instead of simply using a class name in image classification tasks. This makes the model very sensitive to the structure of prompt templates [2]. To mitigate this limitation, a CoOp has proposed a few-shot prompt learning method that replaces CLIP’s hand-crafted prompts with learnable tokens optimized for specific tasks [3].CoOp  shows high performance with correctly crafted prompts compared to CLIP. 
+Recent advances in VLM include Contrastive Language-Image Pretraining (CLIP) and Context Optimization (CoOp) models. CLIP is a zero-shot vision–language model that learns to match images with text rather than relying only on class names. It turns an image into a vector of numbers and a text prompt into another vector, then checks how similar those vectors are. This makes the model rely on prompt templates like “a photo of a {}.” instead of simply using a class name in image classification tasks. This makes the model very sensitive to the structure of prompt templates [2]. To mitigate this limitation, a CoOp has proposed a few-shot prompt learning method that replaces CLIP’s hand-crafted prompts with learnable tokens optimized for specific tasks [3].CoOp  shows high performance with correctly crafted prompts compared to CLIP.
+</p>
+ 
 
 ## Problem Statement
-Studies show that VLMs such as CLIP and CoOp achieve high accuracy with carefully engineered prompts; however, they are highly sensitive to the way people craft the prompt (wording + structure). Which means accuracy can change a lot based on how the text input is phrased [3]. For example, “a photo of a cat” and “an image of the cat” both have the same meaning however, these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
+<p align="justify">
+ Studies show that VLMs such as CLIP and CoOp achieve high accuracy with carefully engineered prompts; however, they are highly sensitive to the way people craft the prompt (wording + structure). Which means accuracy can change a lot based on how the text input is phrased [3]. For example, “a photo of a cat” and “an image of the cat” both have the same meaning however, these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
 
 This limits their usability in noisy, multilingual, or user-generated contexts, which are common real-world situations where user prompts often include noise, typos, or informal expressions.
+</p>
+
 
 
 ## Application Area and Project Domain
-This project is an intersection between natural language processing, computer vision, and deep learning. The application area includes systems where users interact with models through text prompts, such as searching for an image, educational tools like a visual homework helper, a recommendation system, and E-commerce visual search, where users frequently introduce informal expressions, non-standard spellings, or typographic noise, making robustness to prompt variation a key requirement. By building a reproducible noise benchmark and evaluating sensitivity, the project directly contributes to the broader domain of robust and trustworthy AI.
+<p align="justify">
+ This project is an intersection between natural language processing, computer vision, and deep learning. The application area includes systems where users interact with models through text prompts, such as searching for an image, educational tools like a visual homework helper, a recommendation system, and E-commerce visual search, where users frequently introduce informal expressions, non-standard spellings, or typographic noise, making robustness to prompt variation a key requirement. By building a reproducible noise benchmark and evaluating sensitivity, the project directly contributes to the broader domain of robust and trustworthy AI.
+</p>
 
 
 ## What is the paper trying to do, and what are you planning to do?
-
-The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
+<p align="justify">
+ The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
 
 <p align="center">
  <img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" />
@@ -50,6 +58,7 @@ RQ2: Does prompt ensembling improve robustness consistently?
 
 Thus, the main objective of this project is, first, to reproduce baseline performance by establishing clean accuracy for CLIP and CoOp models using the OxfordPets dataset, saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will develop a standardized noise benchmark by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will evaluate the sensitivity of CLIP and CoOp to prompt noise by measuring accuracy when prompts contain different levels of noise—this directly answers the first research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will propose a robustness mitigation using ensembling, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=3, K=5). This will be done by constructing K prompt variants for each class (e.g., one clean + K−1 noisy/paraphrased). For each image, the model will be run across all prompts, logits will be converted to probabilities using the softmax function, the probabilities will be averaged across prompts, and the final prediction will be selected with argmax. This will answer the second research question, showing whether prompt ensembling improves the robustness of VLMs consistently.
 
+</p>
 
 
 # THE FOLLOWING IS SUPPOSED TO BE DONE LATER
