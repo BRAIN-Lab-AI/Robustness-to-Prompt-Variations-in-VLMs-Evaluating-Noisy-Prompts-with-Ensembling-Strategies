@@ -25,13 +25,13 @@ This project is an intersection between natural language processing, computer vi
 
 The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
 
-<center><img  alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" /></center>
+<img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" />
 
 Figure 1: Impact of different prompt templates on zero-shot CLIP [2].
 
 To mitigate this, the paper proposes a new method called Context Optimization (CoOp). This is a prompt learning method that replaces hand-crafted prompts, as in the  CLIP mode, with learnable tokens optimized for classification tasks. Its primary goal is to automate and improve prompt learning.  It shows high performance compared to CLIP, as illustrated in Figure 2.
 
-<center><img width="330" height="128" alt="image" src="https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f" /></center>
+<center><img alt="image" src="https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f" /></center>
 
 Figure 2:Prompt engineering vs Context Optimization (CoOp)[3]. 
 
