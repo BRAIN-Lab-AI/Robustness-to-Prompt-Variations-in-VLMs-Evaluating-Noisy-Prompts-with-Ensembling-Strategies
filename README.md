@@ -25,7 +25,7 @@ This project is an intersection between natural language processing, computer vi
 
 The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
 
-<center><img width="287" height="155" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" /></center>
+<center><img  alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" /></center>
 
 Figure 1: Impact of different prompt templates on zero-shot CLIP [2].
 
