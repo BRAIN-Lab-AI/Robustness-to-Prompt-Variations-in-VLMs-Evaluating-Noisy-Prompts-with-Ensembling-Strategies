@@ -51,9 +51,9 @@ The paper illustrates that, while CoOp improves performance, the prompts are not
 
 This leads to these research Questions:
 
-**RQ1:** How sensitive is CLIP  & CoOp to noisy prompts?
+**RQ1: How sensitive is CLIP  & CoOp to noisy prompts?**
 
-**RQ2:** Does prompt ensembling improve robustness consistently?
+**RQ2: Does prompt ensembling improve robustness consistently?**
 
 
 Thus, the main objective of this project is, first, to reproduce baseline performance by establishing clean accuracy for CLIP and CoOp models using the OxfordPets dataset, saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will develop a standardized noise benchmark by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will evaluate the sensitivity of CLIP and CoOp to prompt noise by measuring accuracy when prompts contain different levels of noise—this directly answers the first research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will propose a robustness mitigation using ensembling, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=3, K=5). This will be done by constructing K prompt variants for each class (e.g., one clean + K−1 noisy/paraphrased). For each image, the model will be run across all prompts, logits will be converted to probabilities using the softmax function, the probabilities will be averaged across prompts, and the final prediction will be selected with argmax. This will answer the second research question, showing whether prompt ensembling improves the robustness of VLMs consistently.
@@ -61,7 +61,9 @@ Thus, the main objective of this project is, first, to reproduce baseline perfor
 
 ## References
 [1]	Z. Li, X. Wu, H. Du, F. Liu, H. Nghiem, and G. Shi, “A Survey of State of the Art Large Vision Language Models: Alignment, Benchmark, Evaluations and Challenges,” no. 1, 2025, [Online]. Available: http://arxiv.org/abs/2501.02189
+
 [2]	A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, “Modeling Variants of Prompts for Vision-Language Models,” 2025, [Online]. Available: http://arxiv.org/abs/2503.08229
+
 [3]	K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Learning to Prompt for Vision-Language Models,” Int. J. Comput. Vis., vol. 130, no. 9, pp. 2337–2348, 2022, doi: 10.1007/s11263-022-01653-1.
 
 
