@@ -4,7 +4,7 @@
 ### Authors
 - **Team:** Aishah Altamimi
 - **Supervisor Name:** Dr. Muzammil Behzad
-- **Affiliations:** SABIC, ARAMCO, KFUPM, IAU
+- **Affiliations:** KFUPM, IAU
 
 ## Introduction
 <p align="justify">
