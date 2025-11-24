@@ -145,11 +145,6 @@ This project provides a complete implementation for evaluating and improving the
 - **SigLIP_Robustness.ipynb:** Jupyter notebook used for running experiments, plotting results, and validating all robustness evaluations.
 
 ## Model Workflow
-The workflow of the Robust Vision–Language Evaluation Framework is designed to measure how CLIP, SigLIP, and CoOp behave under clean and noisy prompts, and how ensembling or noise-aware fine-tuning improves their robustness.
-
-
-# Workflow
-
 The workflow of the **Robust Vision-Language Evaluation Framework** is designed to measure how CLIP, SigLIP, and CoOp behave under clean and noisy prompts, and how ensembling or noise-aware fine-tuning improves their robustness.
 
 ---
@@ -255,37 +250,71 @@ The final step compares robustness performance across:
 
 
 
-
-
 ## How to Run the Code
 
 1. **Clone the Repository:**
     ```bash
-    git clone https://github.com/yourusername/enhanced-stable-diffusion.git
-    cd enhanced-stable-diffusion
+    git clone https://github.com/AishahALtamimi/Robustness-to-Prompt-Variations-in-VLMs.git
+    cd VLM-Robustness
     ```
 
 2. **Set Up the Environment:**
     Create a virtual environment and install the required dependencies.
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate  # On Windows use: venv\Scripts\activate
-    pip install -r requirements.txt
+   python3 -m venv venv
+   source venv/bin/activate      # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
     ```
 
-3. **Train the Model:**
-    Configure the training parameters in the provided configuration file and run:
-    ```bash
-    python train.py --config configs/train_config.yaml
-    ```
+3. **Evaluate CLIP (Clean or Noisy Prompts):**
 
-4. **Generate Images:**
-    Once training is complete, use the inference script to generate images.
-    ```bash
-    python inference.py --checkpoint path/to/checkpoint.pt --input "A surreal landscape with mountains and rivers"
-    ```
+python prompt_noise_eval_v4.py \
+  --dataset_name oxford_pets \
+  --dataset_dir path/to/data \
+  --severity_list 0,1,2,3 \
+  --prompt_noises typo,case,space,emoji \
+  --ensemble_k 5 \
+  --include_clean True
+
+
+4. **Evaluate SigLIP:**
+python prompt_noise_eval_siglip.py \
+  --dataset_name oxford_pets \
+  --dataset_dir path/to/data \
+  --severity_list 0,1,2,3 \
+  --prompt_noises typo,case,space,emoji \
+  --ensemble_k 5
+
+5. **Evaluate CoOp Under Noisy Prompts:**
+python coop_noise_eval_min_v5.py \
+  --dataset_name oxford_pets \
+  --dataset_dir path/to/data \
+  --severity_list 0,1,2,3 \
+  --prompt_noises typo,case,space,emoji \
+  --ensemble_k 1
+
+6. **Train the Noise-Aware Adapter for CLIP:**
+   python train_prompt_noise_adapter.py \
+  --dataset_name oxford_pets \
+  --dataset_dir path/to/data \
+  --epochs 10 \
+  --severity_list 1,2,3 \
+  --prompt_noises typo,case,space,emoji
+
+7. **Evaluate CLIP + Adapter (After Training):**
+   python noise_eval.py \
+  --dataset_name oxford_pets \
+  --dataset_dir path/to/data \
+  --adapter_path output/text_adapter/adapter_last.pth \
+  --severity_list 0,1,2,3 \
+  --prompt_noises typo,case,space,emoji
+
+  
 
 ## Acknowledgments
-- **Open-Source Communities:** Thanks to the contributors of PyTorch, Hugging Face, and other libraries for their amazing work.
-- **Individuals:** Special thanks to bla, bla, bla for the amazing team effort, invaluable guidance and support throughout this project.
-- **Resource Providers:** Gratitude to ABC-organization for providing the computational resources necessary for this project.
+- **Open-Source Communities:** We acknowledge the contributions of the PyTorch, Hugging Face, and OpenCLIP communities whose tools enabled this work.
+- **CoOp Implementation:** This project makes use of the official CoOp (Context Optimization) implementation released by the original authors.
+- **Individuals:** We extend our gratitude to all individuals who provided guidance, support, and constructive feedback throughout the project.
+- **Resource Providers:** This research was conducted using Google Colab and GPU resources, which provided the necessary computing environment for training and evaluation.
+
+
