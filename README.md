@@ -126,11 +126,13 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 - **Cross-Model Robustness Evaluation Framework:** Build a unified evaluation pipeline to compare CLIP, SigLIP, and CoOp under different noise types and severities to identify which training objective handles noise best.
 
 ### Proposed Solution: Code-Based Implementation
-This repository provides an implementation of the enhanced stable diffusion model using PyTorch. The solution includes:
+This project provides a complete implementation for evaluating and improving the robustness of vision–language models (CLIP, SigLIP, and CoOp) under noisy prompts. The solution includes:
 
-- **Modified UNet Architecture:** Incorporates residual connections and efficient convolutional blocks.
-- **Novel Loss Functions:** Combines Mean Squared Error (MSE) with perceptual loss to enhance feature learning.
-- **Optimized Training Loop:** Reduces computational overhead while maintaining performance.
+-**Noise Bank Generation:** A dedicated module that automatically creates multiple noisy versions of any prompt, including typos, random casing, extra spaces, and emojis.
+
+-**Robustness Evaluation with Ensembling:** All three models (CLIP, SigLIP, CoOp) are evaluated using clean and noisy prompts. An ensembling strategy is applied to combine predictions from different prompt variants, significantly improving stability under noise.
+
+-**Noise-Aware Adapter for CLIP:** A lightweight adapter is implemented and trained with a consistency regularization loss. This enables CLIP to learn from noisy prompts directly, reducing sensitivity and improving robustness without retraining the full model.
 
 ### Key Components
 - **`model.py`**: Contains the modified UNet architecture and other model components.
