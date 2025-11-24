@@ -270,20 +270,20 @@ The final step compares robustness performance across:
    This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets: Oxford-IIIT Pets,Food-101,DTD (Describable Textures Dataset), EuroSAT, Caltech-101. Because these datasets are publicly accessible, they are not included in this repository.Please  Download them manually or using the commands provided below.
 
    ```bash
-Oxford Pets:
-https://www.robots.ox.ac.uk/~vgg/data/pets/
-
-Food101:
-https://www.vision.ee.ethz.ch/datasets_extra/food-101/
-
-DTD:
-https://www.robots.ox.ac.uk/~vgg/data/dtd/
-
-EuroSAT:
-https://github.com/phelber/EuroSAT
-
-Caltech-101:
-https://data.caltech.edu/records/20086
+        Oxford Pets:
+        https://www.robots.ox.ac.uk/~vgg/data/pets/
+        
+        Food101:
+        https://www.vision.ee.ethz.ch/datasets_extra/food-101/
+        
+        DTD:
+        https://www.robots.ox.ac.uk/~vgg/data/dtd/
+        
+        EuroSAT:
+        https://github.com/phelber/EuroSAT
+        
+        Caltech-101:
+        https://data.caltech.edu/records/20086
     ```
    
 3. **Evaluate CLIP (Clean or Noisy Prompts):**
