@@ -78,10 +78,10 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 - [High-Resolution Image Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2112.10752)
 
 ### Reference Dataset
-- **Oxford Pets:**
+-**Oxford Pets:**
 https://www.robots.ox.ac.uk/~vgg/data/pets/
 
-- **Food101:**
+-**Food101:**
 https://www.vision.ee.ethz.ch/datasets_extra/food-101/
 
 -**DTD:**
