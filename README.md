@@ -84,21 +84,31 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 ## Project Technicalities
 
 ### Terminologies
-- **Diffusion Model:** A generative model that progressively transforms random noise into coherent data.
-- **Latent Space:** A compressed, abstract representation of data where complex features are captured.
-- **UNet Architecture:** A neural network with an encoder-decoder structure featuring skip connections for better feature preservation.
-- **Text Encoder:** A model that converts text into numerical embeddings for downstream tasks.
-- **Perceptual Loss:** A loss function that measures high-level differences between images, emphasizing perceptual similarity.
-- **Tokenization:** The process of breaking down text into smaller units (tokens) for processing.
-- **Noise Vector:** A randomly generated vector used to initialize the diffusion process in generative models.
-- **Decoder:** A network component that transforms latent representations back into image space.
-- **Iterative Refinement:** The process of gradually improving the quality of generated data through multiple steps.
-- **Conditional Generation:** The process where outputs are generated based on auxiliary inputs, such as textual descriptions.
+- **Vision–Language Model (VLM):** A model that connects images and text so it can understand and relate both at the same time.
+- **CLIP:** A vision–language model that learns by matching images with their text descriptions and separating them from mismatched pairs.
+- **CoOp (Context Optimization):** A method that learns the best text prompts automatically instead of using fixed, hand-written prompts.
+- **Prompt:** The text input given to the model (like “a photo of a cat”) that tells it what to look for in an image.
+- **Noisy Prompt:** A prompt that contains small mistakes such as typos, random casing, extra spaces, or emojis.
+- **Prompt Ensembling:** A technique where we use several different versions of a prompt and combine the model’s outputs to get a more stable and accurate prediction.
+- **Robustness:** The ability of a model to keep working well even when the input is imperfect, noisy, or slightly changed.
+- **Contrastive Learning:** A training method where the model pulls matching image–text pairs closer together and pushes non-matching pairs further apart.
+- **Text Encoder:** The part of the model that converts a text prompt into a vector (numeric representation) in embedding space.
+- **Image Encoder:** The part of the model that converts an image into a vector so it can be compared with text vectors.
+- **Zero-Shot Classification:** When the model can recognize new classes it was not explicitly trained on, just by using text prompts.
+-**Consistency Regularization:** A training idea that encourages the model to give similar predictions for clean and noisy versions of the same input.
+- **Noise-Aware Fine-Tuning:** A training phase where the model (or adapter) is updated using noisy prompts so it learns to handle them better.
+- **Adapter:** A small extra module added to a pre-trained model to adjust its behavior without retraining the whole model.
+- **Ensemble Size (K):** The number of different prompts combined together when using prompt ensembling.
+
 
 ### Problem Statements
-- **Problem 1:** Achieving high-resolution and detailed images using conventional diffusion models remains challenging.
-- **Problem 2:** Existing models suffer from slow inference times during the image generation process.
-- **Problem 3:** There is limited capability in performing style transfer and generating diverse artistic variations.
+- **Problem 1:** Vision–language models like CLIP and SigLIP show strong performance only when the prompt is perfectly phrased, making them highly sensitive to small wording changes.
+- **Problem 2:** Semantically similar prompts (e.g., “a photo of a cat” vs. “an image of the cat”) can produce very different predictions, leading to unstable and unpredictable model behavior.
+- **Problem 3:** Minor text variations such as typos, casing differences, extra spaces, or added context (e.g., “in the wild,” “at night”) can cause significant drops in accuracy.
+- **Problem 4:** Current manually designed prompts (used in CLIP and SigLIP) are not robust to natural user mistakes, which limits real-world usability.
+- **Problem 5:** It is unclear how different training objectives (softmax vs. sigmoid vs. learned prompts) affect robustness, and there is no unified evaluation across multiple models.
+- **Problem 6:** There is a need to evaluate and compare the robustness of VLMs—CLIP, SigLIP, and CoOp—under noisy prompts and investigate whether ensembling can reduce performance degradation.
+
 
 ### Loopholes or Research Areas
 - **Evaluation Metrics:** Lack of robust metrics to effectively assess the quality of generated images.
