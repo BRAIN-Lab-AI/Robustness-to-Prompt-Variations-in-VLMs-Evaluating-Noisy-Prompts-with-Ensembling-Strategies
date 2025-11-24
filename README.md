@@ -75,7 +75,7 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 - **Report:** [Project Report](/report.pdf)
 
 ### Reference Paper
-- [High-Resolution Image Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2112.10752)
+- [Learning to Prompt for Vision-Language Models](https://dl.acm.org/doi/10.1007/s11263-022-01653-1)
 
 ### Reference Dataset
 -**Oxford Pets:**
