@@ -78,7 +78,20 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 - [High-Resolution Image Synthesis with Latent Diffusion Models](https://arxiv.org/abs/2112.10752)
 
 ### Reference Dataset
-- [LAION-5B Dataset](https://laion.ai/blog/laion-5b/)
+- **Oxford Pets:**
+https://www.robots.ox.ac.uk/~vgg/data/pets/
+
+- **Food101:**
+https://www.vision.ee.ethz.ch/datasets_extra/food-101/
+
+-**DTD:**
+https://www.robots.ox.ac.uk/~vgg/data/dtd/
+
+-**EuroSAT:**
+https://github.com/phelber/EuroSAT
+
+-**Caltech-101:**
+https://data.caltech.edu/records/20086
 
 
 ## Project Technicalities
@@ -254,8 +267,9 @@ The final step compares robustness performance across:
 
 1. **Clone the Repository:**
     ```bash
-    git clone https://github.com/AishahALtamimi/Robustness-to-Prompt-Variations-in-VLMs.git
-    cd VLM-Robustness
+    git clone https://github.com/AishahALtamimi/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies.git
+     cd Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies
+
     ```
 
 2. **Set Up the Environment:**
@@ -267,23 +281,32 @@ The final step compares robustness performance across:
     ```
 
 3. **Datasets**
-   This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets: Oxford-IIIT Pets,Food-101,DTD (Describable Textures Dataset), EuroSAT, Caltech-101. .Please  Download them manually using the following links.
+   This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets.  
+   Below is a brief description of each dataset:
+
+   - **Oxford-IIIT Pets:** Cat and dog images covering 37 pet breeds.  
+   - **Food-101:** Food images across 101 categories.  
+   - **DTD (Describable Textures Dataset):** Texture patterns such as “bumpy” or “striped.”  
+   - **EuroSAT:** Satellite images representing different land-use types.  
+   - **Caltech-101:** General object images across 101 categories.
+
+   Please download them manually using the links below:
 
    ```bash
-        Oxford Pets:
-        https://www.robots.ox.ac.uk/~vgg/data/pets/
-        
-        Food101:
-        https://www.vision.ee.ethz.ch/datasets_extra/food-101/
-        
-        DTD:
-        https://www.robots.ox.ac.uk/~vgg/data/dtd/
-        
-        EuroSAT:
-        https://github.com/phelber/EuroSAT
-        
-        Caltech-101:
-        https://data.caltech.edu/records/20086
+     Oxford Pets:
+     https://www.robots.ox.ac.uk/~vgg/data/pets/
+     
+     Food101:
+     https://www.vision.ee.ethz.ch/datasets_extra/food-101/
+     
+     DTD:
+     https://www.robots.ox.ac.uk/~vgg/data/dtd/
+     
+     EuroSAT:
+     https://github.com/phelber/EuroSAT
+     
+     Caltech-101:
+     https://data.caltech.edu/records/20086
     ```
    
 3. **Evaluate CLIP (Clean or Noisy Prompts):**
