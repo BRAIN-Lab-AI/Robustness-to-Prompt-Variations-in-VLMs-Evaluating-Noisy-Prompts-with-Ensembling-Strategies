@@ -135,10 +135,14 @@ This project provides a complete implementation for evaluating and improving the
 -**Noise-Aware Adapter for CLIP:** A lightweight adapter is implemented and trained with a consistency regularization loss. This enables CLIP to learn from noisy prompts directly, reducing sensitivity and improving robustness without retraining the full model.
 
 ### Key Components
-- **`model.py`**: Contains the modified UNet architecture and other model components.
-- **`train.py`**: Script to handle the training process with configurable parameters.
-- **`utils.py`**: Utility functions for data processing, augmentation, and metric evaluations.
-- **`inference.py`**: Script for generating images using the trained model.
+
+- **prompt_noise_eval_v4.py:** Main CLIP evaluation script supporting five datasets, four noise types, and three ensembling strategies (K=1, K=5, K=5+Clean).
+- **train_prompt_noise_adapter.py:** Noise-aware adapter training script using Cross-Entropy and KL divergence regularization to fine-tune CLIP under noisy prompts.
+- **prompt_noise_eval_siglip.py:** SigLIP evaluation script built with HuggingFace transformers, supporting prompt noise, severity levels, and prompt ensembling.
+- **coop_noise_eval_min_v5.py:** CoOp robustness evaluation script that tests learned prompts under noisy class-name corruption.
+- **Noise Operators (functions):** Four prompt-corruption functions (typo, case, space, emoji) defined inside all evaluation and training scripts to generate controlled noise at severities 0–3.
+- **TextAdapter (class):** Identity-initialized linear adapter used in training and evaluation scripts to learn noise-robust text embeddings.
+- **SigLIP_Robustness.ipynb:** Jupyter notebook used for running experiments, plotting results, and validating all robustness evaluations.
 
 ## Model Workflow
 The workflow of the Enhanced Stable Diffusion model is designed to translate textual descriptions into high-quality artistic images through a multi-step diffusion process:
