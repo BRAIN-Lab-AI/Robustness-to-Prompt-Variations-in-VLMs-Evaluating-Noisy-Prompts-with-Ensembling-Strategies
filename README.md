@@ -145,20 +145,117 @@ This project provides a complete implementation for evaluating and improving the
 - **SigLIP_Robustness.ipynb:** Jupyter notebook used for running experiments, plotting results, and validating all robustness evaluations.
 
 ## Model Workflow
-The workflow of the Enhanced Stable Diffusion model is designed to translate textual descriptions into high-quality artistic images through a multi-step diffusion process:
+The workflow of the Robust Vision–Language Evaluation Framework is designed to measure how CLIP, SigLIP, and CoOp behave under clean and noisy prompts, and how ensembling or noise-aware fine-tuning improves their robustness.
 
-1. **Input:**
-   - **Text Prompt:** The model takes a text prompt (e.g., "A surreal landscape with mountains and rivers") as the primary input.
-   - **Tokenization:** The text prompt is tokenized and processed through a text encoder (such as a CLIP model) to obtain meaningful embeddings.
-   - **Latent Noise:** A random latent noise vector is generated to initialize the diffusion process, which is then conditioned on the text embeddings.
 
-2. **Diffusion Process:**
-   - **Iterative Refinement:** The conditioned latent vector is fed into a modified UNet architecture. The model iteratively refines this vector by reversing a diffusion process, gradually reducing noise while preserving the text-conditioned features.
-   - **Intermediate States:** At each step, intermediate latent representations are produced that increasingly capture the structure and details dictated by the text prompt.
+# Workflow
 
-3. **Output:**
-   - **Decoding:** The final refined latent representation is passed through a decoder (often part of a Variational Autoencoder setup) to generate the final image.
-   - **Generated Image:** The output is a synthesized image that visually represents the input text prompt, complete with artistic style and detail.
+The workflow of the **Robust Vision-Language Evaluation Framework** is designed to measure how CLIP, SigLIP, and CoOp behave under clean and noisy prompts, and how ensembling or noise-aware fine-tuning improves their robustness.
+
+---
+
+## 1. Input
+
+### Clean and Noisy Prompts
+
+Class names (e.g., "Siamese cat") are inserted into a prompt template:
+- `"a photo of a {class}"`
+
+Four noise transformations create corrupted versions:
+- **typo** - Character substitutions, deletions, or swaps
+- **case-change** - Random capitalization alterations
+- **extra space** - Insertion of whitespace characters
+- **emoji tail** - Addition of emoji characters
+
+Each applied with **severity levels 0–3** (0 = clean, 3 = maximum corruption).
+
+### Prompt Banks (for Ensembling)
+
+For each class:
+- **K = 1** → single prompt (clean or noisy)
+- **K = 5** → five noisy variants
+- **K = 5 + Clean** → one clean + four noisy variants
+
+These are used to test noisy-prompt robustness and ensemble stability.
+
+---
+
+## 2. Evaluation Process
+
+### Text Encoding
+
+Each prompt (clean or noisy) is processed by the model's text encoder:
+- **CLIP** → CLIP text encoder
+- **SigLIP** → SigLIP text encoder (HuggingFace)
+- **CoOp** → Learned context encoder
+
+### Image Encoding
+
+Each input image is passed through the corresponding image encoder to produce image embeddings.
+
+### Similarity & Prediction Logic
+
+#### CLIP & CoOp
+- Use **cosine similarity × 100**
+- Apply **softmax** over classes to get class probabilities
+
+#### SigLIP
+- Does **NOT** use softmax
+- Instead uses **sigmoid-based pairwise scoring** between image and text embeddings
+- Scores are normalized or directly averaged (matching the official SigLIP inference procedure)
+
+This ensures the workflow matches the true SigLIP inference mechanics.
+
+### Prompt Ensembling (K > 1)
+
+For models supporting ensembling:
+- **CLIP / CoOp** → average of softmax probabilities
+- **SigLIP** → average of sigmoid pairwise matching scores
+- The class with the **highest averaged score** becomes the final prediction
+
+This step greatly increases stability under noise.
+
+### Noise-Aware Adapter (Optional for CLIP)
+
+When using the trained adapter:
+1. Text embeddings are passed through the `TextAdapter`
+2. The adapter modifies them to be more stable against prompt noise
+3. Prediction proceeds as usual for each model type
+
+---
+
+## 3. Output
+
+### Accuracy Results
+
+For each noise severity (0–3), the framework reports:
+- Clean accuracy
+- Noisy accuracy  
+- Ensemble vs. non-ensemble performance
+- **Model comparisons:**
+  - CLIP vs. SigLIP vs. CoOp
+  - CLIP vs. CLIP + Adapter
+
+### Robustness Curves
+
+JSON results are visualized as:
+- Accuracy vs. severity
+- Ensemble improvement curves
+- Adapter vs. baseline curves
+
+### Model Comparison
+
+The final step compares robustness performance across:
+- **CLIP** (baseline)
+- **SigLIP** (improved stability)
+- **CoOp** (perfect robustness)
+- **CLIP + Adapter** (noise-aware fine-tuning)
+
+---
+
+
+
+
 
 ## How to Run the Code
 
