@@ -267,7 +267,7 @@ The final step compares robustness performance across:
     ```
 
 3. **Datasets**
-   This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets: Oxford-IIIT Pets,Food-101,DTD (Describable Textures Dataset), EuroSAT, Caltech-101. Because these datasets are publicly accessible, they are not included in this repository.Please  Download them manually or using the commands provided below.
+   This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets: Oxford-IIIT Pets,Food-101,DTD (Describable Textures Dataset), EuroSAT, Caltech-101. .Please  Download them manually using the following links.
 
    ```bash
         Oxford Pets:
@@ -287,7 +287,7 @@ The final step compares robustness performance across:
     ```
    
 3. **Evaluate CLIP (Clean or Noisy Prompts):**
-
+ ```bash
 python prompt_noise_eval_v4.py \
   --dataset_name oxford_pets \
   --dataset_dir path/to/data \
@@ -295,40 +295,47 @@ python prompt_noise_eval_v4.py \
   --prompt_noises typo,case,space,emoji \
   --ensemble_k 5 \
   --include_clean True
+```
 
 
 4. **Evaluate SigLIP:**
+```bash
 python prompt_noise_eval_siglip.py \
   --dataset_name oxford_pets \
   --dataset_dir path/to/data \
   --severity_list 0,1,2,3 \
   --prompt_noises typo,case,space,emoji \
   --ensemble_k 5
-
-5. **Evaluate CoOp Under Noisy Prompts:**
+```
+6. **Evaluate CoOp Under Noisy Prompts:**
+ ```bash
 python coop_noise_eval_min_v5.py \
   --dataset_name oxford_pets \
   --dataset_dir path/to/data \
   --severity_list 0,1,2,3 \
   --prompt_noises typo,case,space,emoji \
   --ensemble_k 1
-
-6. **Train the Noise-Aware Adapter for CLIP:**
+```
+7. **Train the Noise-Aware Adapter for CLIP:**
+ ```bash
    python train_prompt_noise_adapter.py \
   --dataset_name oxford_pets \
   --dataset_dir path/to/data \
   --epochs 10 \
   --severity_list 1,2,3 \
   --prompt_noises typo,case,space,emoji
-
-7. **Evaluate CLIP + Adapter (After Training):**
+```
+8. **Evaluate CLIP + Adapter (After Training):**
+ ```bash
    python noise_eval.py \
   --dataset_name oxford_pets \
   --dataset_dir path/to/data \
   --adapter_path output/text_adapter/adapter_last.pth \
   --severity_list 0,1,2,3 \
   --prompt_noises typo,case,space,emoji
+```
 
+This show how to run each model with oxford_pets dataset. For other datasets only change the dataset name
   
 
 ## Acknowledgments
