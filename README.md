@@ -111,14 +111,19 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 
 
 ### Loopholes or Research Areas
-- **Evaluation Metrics:** Lack of robust metrics to effectively assess the quality of generated images.
-- **Output Consistency:** Inconsistencies in output quality when scaling the model to higher resolutions.
-- **Computational Resources:** Training requires significant GPU compute resources, which may not be readily accessible.
+
+- **Lack of Robustness:** Existing VLMs (e.g., CLIP, SigLIP) cannot handle small prompt mistakes, yet real users make such errors often.
+- **Limited Understanding:** There is no clear explanation of why different models react differently to noisy prompts.
+- **Missing Benchmarks:** Few works evaluate multiple VLMs across several datasets under controlled noise conditions.
+- **Prompt Dependency:** Models still rely heavily on hand-written prompts, which are not scalable.
+- **Training Objective Uncertainty:** The impact of softmax vs. sigmoid vs. learned prompts on robustness is not well explored.
+- **Data Limitations:** Research rarely examines robustness on diverse datasets like EuroSAT, DTD, or Food101.
+-**Inference Overhead:** Existing solutions for robustness often increase computational cost.
 
 ### Problem vs. Ideation: Proposed 3 Ideas to Solve the Problems
-1. **Optimized Architecture:** Redesign the model architecture to improve efficiency and balance image quality with faster inference.
-2. **Advanced Loss Functions:** Integrate novel loss functions (e.g., perceptual loss) to better capture artistic nuances and structural details.
-3. **Enhanced Data Augmentation:** Implement sophisticated data augmentation strategies to improve the model’s robustness and reduce overfitting.
+- **Prompt Ensembling Strategy:** Combine multiple versions of a prompt (clean + noisy variations) to stabilize predictions and reduce sensitivity to typos, casing, and added context.
+- **Noise-Aware Training / Fine-Tuning:** Introduce controlled prompt noise during training to help the model learn stable representations and become more robust to real-world user errors.
+- **Cross-Model Robustness Evaluation Framework:** Build a unified evaluation pipeline to compare CLIP, SigLIP, and CoOp under different noise types and severities to identify which training objective handles noise best.
 
 ### Proposed Solution: Code-Based Implementation
 This repository provides an implementation of the enhanced stable diffusion model using PyTorch. The solution includes:
