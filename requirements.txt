@@ -1,0 +1,14 @@
+torch
+torchvision
+tqdm
+
+# CLIP (OpenAI Implementation)
+git+https://github.com/openai/CLIP.git
+
+# SigLIP (HuggingFace)
+transformers
+accelerate
+timm
+
+# Dassl (Required for CoOp)
+git+https://github.com/KaiyangZhou/Dassl.pytorch.git
