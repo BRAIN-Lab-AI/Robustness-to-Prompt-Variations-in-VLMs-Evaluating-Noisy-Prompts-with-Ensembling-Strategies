@@ -22,7 +22,7 @@ that these models give high accuracy with clean prompts as illustrated in Figure
 
 ## Problem Statement
 <p align="justify">
- Studies show that VLMs such as CLIP and CoOp achieve high accuracy with carefully engineered prompts; however, they are highly sensitive to the way people craft the prompt (wording + structure). Which means accuracy can change a lot based on how the text input is phrased [3]. For example, “a photo of a cat” and “an image of the cat” both have the same meaning however, these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
+ Studies show that VLMs such as CLIP achieve high accuracy with carefully engineered prompts; however, they are highly sensitive to the way people craft the prompt (wording + structure). Which means accuracy can change a lot based on how the text input is phrased [3]. For example, “a photo of a cat” and “an image of the cat” both have the same meaning however, these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
 
 This limits their usability in noisy, multilingual, or user-generated contexts, which are common real-world situations where user prompts often include noise, typos, or informal expressions.
 </p>
@@ -57,12 +57,12 @@ The paper illustrates that, while CoOp improves performance, the prompts are not
 
 This leads to these research Questions:
 
-**RQ1: How sensitive is CLIP  & CoOp to noisy prompts?**
+**RQ1: How sensitive is CLIP, SigLIP & CoOp to noisy prompts?**
 
 **RQ2: Does prompt ensembling improve robustness consistently?**
 
 
-Thus, the main objective of this project is, first, to **reproduce baseline performance** by establishing clean accuracy for CLIP and CoOp models using the OxfordPets dataset, saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will **develop a standardized noise benchmark** by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will **evaluate the sensitivity of CLIP and CoOp to prompt noise** by measuring accuracy when prompts contain different levels of noise—this directly answers the first research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will **propose a robustness mitigation using ensembling**, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=3, K=5). This will be done by constructing K prompt variants for each class (e.g., one clean + K−1 noisy/paraphrased). For each image, the model will be run across all prompts, logits will be converted to probabilities using the softmax function, the probabilities will be averaged across prompts, and the final prediction will be selected with argmax. This will answer the second research question, showing whether prompt ensembling improves the robustness of VLMs consistently.
+Thus, the main objective of this project is, first, to **reproduce baseline performance** by establishing clean accuracy for CLIP,SigLIP and CoOp models using the OxfordPets dataset, saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will **develop a standardized noise benchmark** by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will **evaluate the sensitivity of CLIP,SigLIP and CoOp to prompt noise** by measuring accuracy when prompts contain different levels of noise—this directly answers the first research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will **propose a robustness mitigation using ensembling**, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=1, K=5). This will be done by constructing K prompt variants for each class (e.g., one clean + K−1 noisy/paraphrased). For each image, the model will be run and evalauted across all prompts usind 5 benchmark datasets. This will answer the second research question, showing whether prompt ensembling improves the robustness of VLMs consistently.
 </p>
 
 ## References
