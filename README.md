@@ -13,11 +13,10 @@ that these models give high accuracy with clean prompts as illustrated in Figure
 </p>
 
 
-
 <p align="center">
-<img alt="image" src="[https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f](https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png)" />
+ <img  align="center" alt="image" src="https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png?raw=true" />
   <br>
-  <em>Fig. 1. Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets). Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c). </em>
+  <em>Fig. 1. Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets). Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c).</em>
 </p>
  
 
