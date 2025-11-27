@@ -8,9 +8,14 @@
 
 ## Introduction
 <p align="justify">
- Vision Language Models are models that integrate visual and textual modalities to perform tasks and enable sophisticated applications like visual question answering, image captioning, and visual reasoning [1]. 
+Recent advances in vision–language models (VLMs) include Contrastive Language–Image Pretraining (CLIP), SigLIP (Sigmoid-based Language–Image Pre-Training), and Context Optimization (CoOp). CLIP and SigLIP are zero-shot VLMs that learn to match images with text prompts rather than class names. They encode an image into a vector and a text prompt into another vector, then measure similarity between the two vectors. As this approach depends on text prompt templates such as “a photo of a {class}” instead of the class name. This makes the model’s behavior affected by the way prompts are structured [2]. To mitigate this sensitivity, CoOp has been proposed, which replaces CLIP’s handcrafted prompts with learnable continuous tokens optimized for specific tasks [3]. CoOp shows high performance with clean prompts. These models facilitate many tasks such as zero-shot image classification, caption generation, and image–text retrieval [3]. Additionally, VLMs are increasingly used in real-world applications where users interact with systems through natural language prompts—such as image search engines, educational tools (e.g. visual homework helpers), recommendation systems, and e-commerce visual search. In these applications, user queries often contain mistakes, informal phrasing,non-standard spellings, or typographic noise. We observed
+that these models give high accuracy with clean prompts as illustrated in Figure1 (a); however, they show different behavior under noisy prompts Figure1 (b), and we noticed that Ensembling during test time recovers the accuracy Figure1 (c).
+</p>
 
-Recent advances in VLM include Contrastive Language-Image Pretraining (CLIP) and Context Optimization (CoOp) models. CLIP is a zero-shot vision–language model that learns to match images with text rather than relying only on class names. It turns an image into a vector of numbers and a text prompt into another vector, then checks how similar those vectors are. This makes the model rely on prompt templates like “a photo of a {}.” instead of simply using a class name in image classification tasks. This makes the model very sensitive to the structure of prompt templates [2]. To mitigate this limitation, a CoOp has proposed a few-shot prompt learning method that replaces CLIP’s hand-crafted prompts with learnable tokens optimized for specific tasks [3].CoOp  shows high performance with correctly crafted prompts compared to CLIP.
+<p align="center">
+<img alt="image" src="https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f" />
+  <br>
+  <em>Fig. 1. Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets). Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c). </em>
 </p>
  
 
@@ -60,12 +65,19 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 </p>
 
 ## References
-[1]	Z. Li, X. Wu, H. Du, F. Liu, H. Nghiem, and G. Shi, “A Survey of State of the Art Large Vision Language Models: Alignment, Benchmark, Evaluations and Challenges,” no. 1, 2025, [Online]. Available: http://arxiv.org/abs/2501.02189
-
-[2]	A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, “Modeling Variants of Prompts for Vision-Language Models,” 2025, [Online]. Available: http://arxiv.org/abs/2503.08229
-
-[3]	K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Learning to Prompt for Vision-Language Models,” Int. J. Comput. Vis., vol. 130, no. 9, pp. 2337–2348, 2022, doi: 10.1007/s11263-022-01653-1.
-
+[1] Z. Li, X. Wu, H. Du, F. Liu, H. Nghiem, and G. Shi, “A Survey of State of the Art Large Vision Language Models: Alignment, Benchmark, Evaluations and Challenges,” 2025. [Online]. Available: http://arxiv.org/abs/2501.02189
+[2] A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, “Modeling Variants of Prompts for Vision-Language Models,” 2025. [Online]. Available: http://arxiv.org/abs/2503.08229
+[3] K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Learning to Prompt for Vision- Language Models,” Int. J. Comput. Vis., vol. 130, no. 9, pp. 2337–2348,2022.
+[4] X. Zhai et al., “Sigmoid Loss for Language Image Pre-Training,” in Proc. IEEE/CVF International Conference on Computer Vision (ICCV), 2023, pp. 11975–11986.
+[5] J. Zhang, J. Huang, S. Jin, and S. Lu, “Vision-Language Models for Vision Tasks: A Survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence, 2023, pp. 1–24.
+[6] Q. Ye, M. Axmed, R. Pryzant, and F. Khani, “Prompt Engineering a Prompt Engineer,” 2024, pp. 355–385.
+[7] Z. Li, B. Peng, P. He, and X. Yan, “Evaluating the Instruction-Following Robustness of Large Language Models to Prompt Injection,” 2024, pp.557–568.
+[8] Q. Xie, Z. Dai, E. Hovy, M. Luong, and Q. V Le, “Unsupervised Data Augmentation for Consistency Training,” no. NeurIPS, pp. 1–13, 2020.
+[9] O. M. Parkhi, A. Vedaldi, A. Zisserman, and C. V. Jawahar, “Cats and dogs,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2012. Available: https://www.robots.ox.ac.uk/∼vgg/data/pets/
+[10] L. Fei-Fei, R. Fergus, and P. Perona, “Learning generative visual models from few training examples: An incremental Bayesian approach tested on 101 object categories,” in 2004 Conference on Computer Vision and Pattern Recognition Workshop, 2004, pp. 178–178. Available: https://data.caltech.edu/records/mzrjq-6wc02
+[11] L. Bossard, M. Guillaumin, and L. Van Gool, “Food-101 – mining discriminative components with random forests,” in European Conference on Computer Vision (ECCV), 2014, pp. 446–461. Available: https://www.kaggle.com/datasets/dansbecker/food-101
+[12] M. Cimpoi, S. Maji, I. Kokkinos, S. Mohamed, and A. Vedaldi, “Describing textures in the wild,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2014, pp. 3606–3613. Available:https://www.robots.ox.ac.uk/∼vgg/data/dtd/
+[13] P. Helber, B. Bischke, A. Dengel, and D. Borth, “EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 12, no. 7, pp. 2217–2226, 2019. Available:https://github.com/phelber/eurosat
 
 
 # THE FOLLOWING IS SUPPOSED TO BE DONE LATER
