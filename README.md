@@ -12,6 +12,8 @@ Recent advances in visionâ€“language models (VLMs) include Contrastive Languageâ
 that these models give high accuracy with clean prompts as illustrated in Figure1 (a); however, they show different behavior under noisy prompts Figure1 (b), and we noticed that Ensembling during test time recovers the accuracy Figure1 (c).
 </p>
 
+
+
 <p align="center">
 <img alt="image" src="[https://github.com/user-attachments/assets/0f9756d0-e713-49fc-b0be-822a55c34d0f](https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png)" />
   <br>
