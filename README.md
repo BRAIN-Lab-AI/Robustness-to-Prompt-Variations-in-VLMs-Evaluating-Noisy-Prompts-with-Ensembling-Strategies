@@ -463,7 +463,62 @@ This show how to run each model with oxford_pets dataset. For other datasets onl
 
 
 # Results**
+### Baseline Model Comparison
 
+<p align="center">
+  <img src="assets/3.png" width="80%" alt="Clean Accuracy Comparison" />
+</p>
+
+**Figure 3:** Comparison of clean accuracy across CLIP, CoOp, and SigLIP baseline models on five benchmark datasets. CoOp consistently outperforms both CLIP and SigLIP across all datasets, demonstrating the effectiveness of learnable context optimization.
+
+---
+
+### CLIP Robustness Analysis
+
+<p align="center">
+  <img src="assets/4.png" width="48%" alt="CLIP Robustness" />
+  <img src="assets/5.png" width="48%" alt="CLIP Ensemble Strategies" />
+</p>
+
+**Figure 4:** CLIP robustness under noisy prompts across all datasets using K=5+Clean ensemble strategy. Oxford Pets and Food101 demonstrate strong resilience, while DTD and EuroSAT show significant degradation under noise.
+
+**Figure 5:** Comparison of CLIP ensemble strategies on Oxford Pets dataset. The K=5 No Clean strategy shows better robustness than single prompts (K=1), while K=5+Clean achieves the best performance.
+
+---
+
+### Model Robustness Comparison
+
+<p align="center">
+  <img src="assets/6.png" width="80%" alt="Model Comparison on Oxford Pets" />
+</p>
+
+**Figure 6:** Robustness comparison between CLIP, CoOp, and SigLIP on Oxford Pets dataset. CoOp demonstrates perfect stability across all noise levels (91.11%), while CLIP shows gradual degradation and SigLIP exhibits significant improvement with ensembling.
+
+---
+
+### Adapter Fine-Tuning Impact
+
+<p align="center">
+  <img src="assets/7.png" width="48%" alt="K=1 Before/After Adapter" />
+  <img src="assets/8.png" width="48%" alt="K=5 Clean+Noisy Before/After" />
+</p>
+
+**Figure 7:** K=1 (single prompt per class). Noise severely degrades the baseline CLIP accuracy from 87.62% to 7.00% at severity 3. Noise-aware fine-tuning significantly improves robustness, raising severity-3 accuracy to 23.79% (+16.79 points).
+
+**Figure 8:** K=5 with CLEAN+4 NOISY prompts (ensembling). Ensembling stabilizes CLIP under noise, and the adapter further enhances robustness. Accuracy at severity 3 increases from 68.85% to 85.83% after fine-tuning (+16.98 points).
+
+---
+
+<p align="center">
+  <img src="assets/9.png" width="48%" alt="K=5 All Noisy Before/After" />
+  <img src="assets/10.png" width="48%" alt="Ensemble Strategy Summary" />
+</p>
+
+**Figure 9:** K=5 all NOISY prompts (no clean, ensembling). This setting is the hardest for CLIP: accuracy drops to 34.61% at severity 3 without adaptation. Noise-aware fine-tuning provides substantial improvement, boosting severity-3 accuracy to 75.36% (+40.75 points).
+
+**Figure 10:** Impact of test-time ensembling and noise-aware fine-tuning on CLIP across different ensemble configurations (Oxford Pets, Severity 3). The combination of K=5 including Clean prompts with fine-tuning achieves 85.1% accuracy, demonstrating that both strategies are complementary.
+
+---
 
 
 # Project Structure
