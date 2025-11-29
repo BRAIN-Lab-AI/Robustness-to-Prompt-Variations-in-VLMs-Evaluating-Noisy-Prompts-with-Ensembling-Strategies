@@ -1,0 +1,875 @@
+\documentclass[conference]{IEEEtran} 
+\usepackage{graphicx} 
+\usepackage{amsmath} 
+\usepackage{cite} 
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode} 
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+
+\newcommand{\cmark}{\ding{51}} % ✓
+\newcommand{\xmark}{\ding{55}} % ✗
+\usepackage{tikz}
+% \usetikzlibrary{shapes,arrows,positioning,calc}
+\usepackage{comment}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+
+
+
+
+\begin{document} 
+
+\title{Enhancing Robustness to Prompt Variations in Vision Language Models: 
+A Comprehensive Evaluation of CLIP, SigLIP, and CoOp under Noisy Prompts with Ensembling Strategies} 
+
+\author{
+    \IEEEauthorblockN{Aishah Altamimi}
+    \IEEEauthorblockA{Student IDs: g202501850 \\ King Fahd University of Petroleum and Minerals \\ Dhahran, Saudi Arabia}
+    \and
+    \IEEEauthorblockN{Supervised by: Dr. Muzammil Behzad}
+    \IEEEauthorblockA{muzammil.behzad@kfupm.edu.sa \\ King Fahd University of Petroleum and Minerals \\ Dhahran, Saudi Arabia}
+}
+
+\maketitle 
+
+\begin{abstract} 
+Vision Language Models (VLMs) like CLIP and SigLIP are zero-shot VLMs that learn to match images with text prompts rather than class names. This makes the model's behavior affected by the way prompts are structured. This paper builds a reproducible noise benchmark and evaluating model sensitivity to noisy prompts using ensembling methods. The evaluation of the three models CLIP, SigLIP, and CoOp is conducted across five benchmark datasets:Oxford-III Pets, Caltech101, Food101, DTD, and EuroSAT (RGB), each representing a different visual domain. Using clean prompts, noisy prompts with different severity levels, and several test-times ensembling methods, our results show that CLIP is very sensitive to noise when using a single prompt, but test-time ensembling can almost fully recover its clean accuracy. For example, on Oxford Pets, accuracy at the highest noise level rises from 25.2\% to 68.8\% with the K=5 strategy (four noisy prompts + 1 clean). SigLIP performs better than CLIP on harder datasets such as DTD and EuroSAT, while CoOp stays stable across all noise levels. Finally, we introduce a noise-aware fine-tuning approach that trains a small adapter using corrupted prompts. This further boosts robustness, especially for CLIP, achieving improvements of +30–40\% at high noise levels. Overall, the study demonstrates that test-time ensembling and noise-aware fine-tuning improves VLM reliability under prompt corruption.
+\end{abstract} 
+
+\begin{IEEEkeywords}
+VLMs, CLIP, SigLIP, CoOp, Prompt Robustness, Noisy Prompts, Contrastive Learning, Zero-Shot Classification, Ensemble Prompting.
+\end{IEEEkeywords}
+
+\section{Introduction} 
+\subsection{Background and Significance} 
+
+Recent advances in vision–language models (VLMs) include Contrastive Language–Image Pretraining (CLIP), SigLIP (Sigmoid-based Language–Image Pre-Training), and Context Optimization (CoOp). CLIP and SigLIP are zero-shot VLMs that learn to match images with text prompts rather than class names. They encode an image into a vector and a text prompt into another vector, then measure similarity between the two vectors. As this approach depends on text prompt templates such as “a photo of a \{class\}" instead of the class name. This makes the model's behavior affected by the way prompts are structured \cite{ref2}. To mitigate this sensitivity, CoOp has been proposed, which replaces CLIP’s hand-crafted prompts with learnable continuous tokens optimized for specific tasks\cite{ref3}. CoOp shows high performance with clean prompts. These models facilitate many tasks such as zero-shot image classification, caption generation, and image–text retrieval \cite{ref3}. Additionally, VLMs are increasingly used in real-world applications where users interact with systems through natural language prompts—such as image search engines, educational tools (e.g. visual homework helpers), recommendation systems, and e-commerce visual search. In these applications, user queries often contain mistakes, informal phrasing, non-standard spellings, or typographic noise. 
+We observed that these models give high accuracy with clean prompts as illustrated in Figure\ref{fig:oxfordpets-birman} (a); however, they show different behavior under noisy prompts Figure\ref{fig:oxfordpets-birman} (b), and we noticed that Ensembling during test time recovers the accuracy Figure\ref{fig:oxfordpets-birman} (c).
+
+
+\begin{figure}[t]
+    \centering
+    % Make the image very small
+    \includegraphics[width=0.22\textwidth]{Birman_43.jpg}\\[0.5em]
+
+    \fbox{
+        \parbox{0.9\linewidth}{
+        \textbf{(a) Clean prompt (correct)}\\
+        \textit{Prompt:} ``a photo of a \textbf{birman cat}''\\
+        \textit{Prediction:} birman (\cmark)
+        }
+    }\\[0.4em]
+
+    \fbox{
+        \parbox{0.9\linewidth}{
+        \textbf{(b) Noisy prompt (misclassified)}\\
+        \textit{Prompt:} ``a phots of  bIrMaN   ca t''\\
+        \textit{Prediction:} tabby (\xmark)
+        }
+    }\\[0.4em]
+
+    \fbox{
+        \parbox{0.9\linewidth}{
+        \textbf{(c) Ensemble of noisy prompts (recovered)}\\
+        \textit{Prompts:} averaged over multiple corrupted variants 
+        (typo, case, space) of ``a photo of a birman cat''\\
+        \textit{Prediction (averaged logits):} birman (\cmark)
+        }
+    }
+
+    \caption{
+       Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets).
+       Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c).
+    }
+    \label{fig:oxfordpets-birman}
+\end{figure}
+
+
+
+
+
+\subsection{Challenges in Current Techniques} 
+Although many applications rely on vision–language models to understand text and connect it with visual information, we still know very little about how stable these models are when the input prompts contain noise or small variations. This makes robustness to prompt changes an essential requirement. In this project, we build a reproducible noise benchmark and assess how sensitive different models are to these variations.By building a reproducible noise benchmark and evaluating sensitivity, this research aims to contribute to the broader domain of robust and trustworthy AI. 
+
+\subsection{Problem Statement} 
+
+Despite vision–language models (VLMs) have improved a lot, studies show that models like CLIP work well with carefully crafted prompt. Which means accuracy can change a lot based on how the text input is phrase \cite{ref1}. For example, “a photo of a cat” and “an image of the cat” both have same meaning however these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
+To address these issues, this research aims to evaluate the robustness of three VLMs under noisy prompts using ensembling strategy:
+
+• \textbf{CLIP} (Contrastive Language-Image Pre-training), relies on manually designed prompts and uses a softmax-based contrastive loss during training \cite{ref2}.
+
+• \textbf{SigLIP} (Sigmoid-based Language-Image Pre-training), which also relies on manually crafted prompts but replaces softmax with a sigmoid-based pairwise contrastive loss \cite{ref2}.
+
+• \textbf{CoOp} Context Optimization, which is built on top of CLIP and attempts to automate prompt design by learning continuous context tokens\cite{ref1}.
+
+\subsection{Objectives} 
+
+The main objective of this research is to provide a comprehensive evaluation of various VLMs on their robustness to prompt variation by:
+\begin{enumerate}
+  \item Establish baseline for three major vision–language models—CLIP, SigLIP, and CoOp across five benchmark datasets using clean, manually engineered prompts.
+
+  \item Systematically evaluate models robustness to noise prompt, including multiple noise types (typos, random casing, spacing noise, emoji noise) and multiple severity levels (0,1,2,3), to quantify how text perturbations affect model predictions.
+
+  \item Investigate the effectiveness of prompt ensembling strategies at inference time, comparing configurations such as:
+   \begin{itemize}
+  \item K = 1 (single prompt)
+ \item K = 5 hybrid (clean + noisy prompts)
+  \item K = 5 all-noise
+  \end{itemize}
+to determine whether ensembling can mitigate performance degradation and stabilize predictions.
+
+  \item Analyze architectural and training-loss differences among softmax-based contrastive models (CLIP), sigmoid-based pairwise contrastive models (SigLIP), and continuous learned prompt representations (CoOp), in order to understand which paradigm exhibits stronger robustness under prompt variations.
+
+  \item Develop and evaluate noise-aware regularization techniques—such as noise-augmented prompt training—to improve resilience beyond baseline zero-shot performance
+\end{enumerate}
+
+\subsection{Scope of Study} 
+This study focuses on evaluating the robustness of several vision–language models to noisy text prompts and on developing noise-aware regularization techniques such as noise-augmented prompt training. The evaluation is conducted across five benchmark datasets—Oxford-IIIT Pets, Caltech-101, Food-101, DTD, and EuroSAT (RGB)—each representing a different visual domain. The work concentrates specifically on textual prompt corruption (typos, casing noise, spacing noise, and emoji noise) and does not address visual corruption. All experiments are carried out in the zero-shot setting for CLIP and SigLIP and the few-shot setting for CoOp, without fine-tuning the visual encoders. Performance is assessed using top-1 and robustness degradation across severity levels.
+
+\section{Literature Review} 
+\subsection{Overview of Existing Techniques} 
+Vision–Language Models (VLMs) use large collections of image–text pairs from the web to learn joint representations of visual and textual information. This enables them to perform tasks such as zero-shot image classification, caption generation, and image–text retrieval without requiring task-specific training \cite{ref5}.
+An example of these models is Contrastive Language-Image Pre-training (CLIP), a method to train image models using natural language descriptions instead of traditional labeled categories. By learning from 400 million image-text pairs \cite{ref3}. CLIP uses a contrastive objective that pulls matched image–text pairs closer together in embedding space while pushing mismatched pairs apart. In this way, the model learns how to align similar images and texts together, making it possible to perform zero-shot predictions by comparing an image's embedding to the embeddings of candidate text prompts\cite{ref5}. This is achieved via training the model with the softmax normalization loss function, to normalize the pairwise similarity scores across all images, then all texts \cite{ref4}.
+
+Another example of a VLM is SigLIP, which follows a similar contrastive learning approach to CLIP. However, the key difference between the two models lies in their training objective. While CLIP uses a softmax‐based cross-entropy loss to normalize similarities across all image–text pairs, SigLIP replaces this with a sigmoid-based pairwise loss. This difference might affecting the models robustness to prompt variations\cite{ref2}.
+
+CoOp (Context Optimization) is a prompt-learning framework built on top of CLIP that replaces hand-crafted text prompts with learnable continuous context vectors, while keeping all pre-trained CLIP parameters fixed \cite{ref3} as illustrated in Figure \ref{fig:CoOp} . Although CoOp achieves strong performance with optimized prompts, its robustness to prompt corruption and distributional shifts remains limited, since the learned context can overfit to clean training examples rather than generalizing to noisy or unseen prompt variations \cite{ref1}.
+
+
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{CoOp.png}
+\caption{CoOp uses a set of learnable vectors.\cite{ref3}}
+\label{fig:CoOp}
+\end{figure} 
+
+For Natural Language Processing (NLP) tasks, Large Language Models (LLMs) are considered useful tools. Users interact with these models using prompts, and the way users craft these prompts significantly affects the model’s results. Usually, users create an initial prompt and then perform multiple rounds of refinement to get the optimal result. This process of refining prompts is called prompt engineering \cite{ref6}. Additionally, model robustness is an important evaluation metric, which involves measuring models ability to preform well even under noisy prompts \cite{ref7}.
+
+Test-Time Transformation Ensembling (TTE) improves model robustness without any retraining. The approach works by creating multiple versions of the same input, running the model on each version, and then combining the predictions. Previous studies have shown that this strategy helps reduce the impact of noise, leading to more reliable predictions at test time  \cite{ref7}.
+
+
+\subsection{Related Work} 
+Although VLMs such as CLIP \cite{ref3}, SigLIP \cite{ref4}, and CoOp \cite{ref3} show good accuracy with clean prompts, their behavior under imperfect prompts remains unclear. CLIP model trained using a Softmax loss function. The main goal of this function is maximizing the similarity for correct pairs while minimizing it for all other pairs in the batch through softmax normalization. SigLIP uses the same approach as CLIP; however, the main difference between CLIP and SigLIP is in the way of computing the loss function. CLIP uses SoftMax normalization to compute the loss during training\cite{ref4}, while SigLIP uses sigmoid-based contrastive loss\cite{ref4}. On the other hand, CoOp is built on top of CLIP and replaces hand-crafted text prompts with learnable continuous context vectors, while keeping all pre-trained CLIP parameters fixed\cite{ref3}.
+
+Test-Time Transformation Ensembling (TTE) approach is work by creating multiple versions of the same input. Then run the model with each copy. After that, combining the model’s predictions of these copies. This approach is simple as it does not need any retraining. Previous studies show that this approach helps reduce the impact of noise\cite{ref7}.
+
+\subsection{Limitations in Existing Approaches} 
+\begin{enumerate}
+
+\item \textbf{Sensitivity to Textual Perturbations }
+Current VLMs are very sensitive to small changes in the input text. Even a tiny typo, a missing space, or a change in letter case (e.g., “a photo of a dog” vs. “a phots of a dog”) can significantly change the model’s understanding and lead to different accuracy. Most existing evaluations use clean prompts, which does not consider noisy text people actually use in real applications.
+
+\item \textbf{Differences in Training Objectives Across Models}
+
+Different VLMs, such as CLIP and SigLIP, are trained using different loss functions, which may affect how they handle noisy prompts. This raises an important question about which model is naturally more robust when the input text contains errors or variations. It also suggests that the choice of training objective could influence how sensitive each model is to small changes in the prompt. However, there is currently no study that directly compares the robustness of these models under noisy prompt conditions, leaving this gap unexplored in the existing literature
+
+\item \textbf{High Cost of Retraining }
+Fixing these robustness problems usually requires adversarial training with noisy data. However, these methods are expensive, need a lot of labeled examples, and can cause catastrophic forgetting which means when a model is trained on new data, it may forget what it previously learned. In other words, improving its performance on noisy prompts can unintentionally reduce its accuracy on clean or previously seen data because the new training overwrites earlier knowledge. Therefore, in this study we uses Test-Time Ensembling (TTE) which improves performance on new tasks (like robustness) without changing the model's weights, thus avoiding the risk of forgetting what it already knows.
+
+
+\end{enumerate}
+
+\section{Proposed Methodology} 
+\subsection{Existing Model and Challenges} 
+Current VLMs like CLIP,SigLIP, and CoOp are very sensitive to small changes in the input text. Even a tiny typo, a missing space, or a change in letter case (e.g., “a photo of a dog” vs. “a phots of a dog”) can significantly change the model’s understanding and lead to different accuracy. Most existing evaluations use clean prompts, which does not consider noisy text people actually use in real applications. However, these models are core to many application areas include systems where users interact with models through text prompts such as searching for an image, educational tools like visual homework helper, recommendation systems, and E-commerce visual search, where users frequently introduce informal expressions, non-standard spellings, or typographic noise, making robustness to prompt variation a key requirement. By building a reproducible noise benchmark and evaluating sensitivity, this research directly contributes to the broader domain of robust and trustworthy AI. 
+
+\subsection{Proposed Enhancements} 
+This study consists of three phases:
+
+
+\textbf{Phase 1:  Baseline Benchmarking (Clean Prompts)}, this phase, we evaluate three models: CLIP, SigLIP, and CoOp using clean prompts across five datasets: Oxford Pets, Caltech- 101, Food-101, DTD, and EuroSAT. For the split each dataset use 50\% of the data in training, 20\% of the data in validation, and 30\% of the data for testing. For each dataset, we calculate the accuracy, error rate, and macro-F1 score. This phase establishes a clear baseline showing how each model performs under clean prompts. So, the results can be used as a reference in phase 2 and 3.
+
+
+
+\textbf{Phase 2: Noise Robustness Evaluation}. 
+
+In Phase 2, we evaluate the robustness of CLIP, SigLIP, and CoOp under noisy prompts. We build a Noise Prompt Bank where each clean prompt example: (”a photo of a class”) is modified using four types of noises: typos, letter case changes, extra spaces, and emoji insertions. For each noise type, we generate modifications across four severity levels (0–3), where level 0 is clean and higher levels introduce heavier corruption (e.g., ”A PhotO of a doG” at severity 3). For each model, dataset, and noise level, we measure classification accuracy under three test time ensembling strategies: K=1 (single noisy prompt), K=5 includes Clean (ensemble of four noisy prompts plus one clean prompt), and K=5 No Clean (ensemble of five noisy prompts only).
+
+
+
+\textbf{Phase 3: Noise-Aware Fine-Tuning.} In the final phase, we train the CLIP model using noisy prompts (Regularization technique) and evaluate it on the Oxford Pets dataset. The goal is to determine whether training the model with noisy prompts as a regularization technique can enhance the model’s robustness and reduce model sensitivity to noisy prompts 
+
+
+\subsection{Algorithm and Implementation}
+
+\subsubsection{Algorithmic Framework} 
+
+Our evaluation framework systematically assesses the robustness of VLMs through a methodology consistent of three phases . Phase 1 establishes clean baseline performance for CLIP, SigLIP, and CoOp across five datasets. Phase 2 evaluates robustness under prompt variation through noisy prompts and ensemble strategy, as outlined in Algorithm~\ref{alg:prompt_robustness}. The algorithm tests how different noise types, severity levels, and prompt strategies work together and how they perform. Phase 3 introduces noise-aware adapter fine-tuning for CLIP using regularization to enhance robustness. 
+
+
+\subsubsection{Model Architecture and Configuration}
+
+We evaluate three VLM architectures: CLIP~\cite{ref3}, SigLIP~\cite{ref4}, and CoOp~\cite{ref3}. For CLIP and SigLIP, we employ the models in their zero-shot configuration with frozen backbone parameters. CoOp is evaluated using its learned context optimization approach. 
+
+\subsubsection{Dataset Selection and Preprocessing}
+
+In this study, we use Five datasets: Oxford Pets, Caltech-101, Food-101, DTD (Describable Textures Dataset), and EuroSAT (RGB). Each dataset represents a different visual domain. Table~\ref{tab:datasets} summarizes the key details of each dataset.
+
+
+\subsubsection{Prompt Template and Noise Injection}
+
+We use the standard prompt template "a photo of a \{class\}" as our base, where \{class\} is replaced with the actual class name from each dataset. To test robustness systematically, we apply four types of noise functions:
+
+\begin{enumerate}
+    \item \textbf{Typos}: Character substitutions, deletions, and insertions.
+    \item \textbf{Case changes}: Random capitalization alterations (e.g., "Dog" → "dOG")
+    \item \textbf{Spacing errors}: Adding or removing spaces.
+    \item \textbf{Emoji injection}: Inserting emoji characters.
+\end{enumerate}
+
+Each noise type has four severity levels: $s \in \{0, 1, 2, 3\}$. Level 0 means no noise (clean prompt), while higher levels introduce increasingly  corruption. For example, typo injection at $s=1$ might change one character, while $s=3$ corrupts multiple words throughout the prompt.
+
+\subsubsection{Prompt Ensemble Strategy}
+
+We test two ensemble sizes: $k=1$ (single prompt) and $k=5$ (five prompts per class). For $k=5$, we create five different noisy versions of each prompt by randomly sampling from our noise functions. We also test two variants:
+
+\begin{itemize}
+    \item \textbf{K=5+Clean}: Uses one clean prompt plus four noisy variants
+    \item \textbf{K=5 No Clean}: Uses five noisy prompts with no clean version
+\end{itemize}
+
+At test time, we calculate how well the image matches each of the $k$ text prompts, average these scores, and then apply the corresponding loss function (Softmax with CLIP and Sigmoid with SigLIP) to get the final prediction. This averaging helps the model make more reliable predictions even when individual prompts are corrupted.
+
+
+
+\begin{algorithm}[t]
+\caption{Noise-Aware Prompt Robustness Evaluation for Vision--Language Models}
+
+\label{alg:prompt_robustness}
+\small
+\begin{algorithmic}[1]
+
+\Require
+\State Datasets $\mathcal{D}$ = \{Pets, DTD, EuroSAT\}
+\State Models $\mathcal{M}$ = \{\text{CLIP}, \text{SigLIP}, \text{CoOp}\}
+\State Prompt template $T(\cdot)$ (e.g., ``a photo of a \{class\}'')
+\State Noise functions $\mathcal{N}$ = \{\text{typo}, \text{case}, \text{space}, \text{emoji}\}
+\State Severity levels $\mathcal{S} = \{0,1,2,3\}$, ensemble sizes $\mathcal{K} = \{1,5\}$
+\State Flag $\textit{include\_clean} \in \{\text{True}, \text{False}\}$
+
+\Ensure
+\State Accuracy and robustness metrics for each (model, dataset, noise setting)
+
+\For{each dataset $D \in \mathcal{D}$}
+  \State Load images and labels from disk.
+  \State Apply preprocessing: resize / center-crop, convert to tensor, normalize.
+  \For{each model $M \in \mathcal{M}$}
+    \State Load pre-trained VLM $M$ (CLIP, SigLIP, or CoOp head).
+    \State Freeze backbone parameters (zero-shot / few-shot setting).
+    \For{each severity level $s \in \mathcal{S}$}
+      \For{each ensemble size $k \in \mathcal{K}$}
+        \State \textbf{Build prompt bank} for each class:
+        \For{each class name $c$}
+          \State Start with clean text $t_{\text{clean}} = T(c)$.
+          \If{$\textit{include\_clean} = \text{True}$}
+            \State Add $t_{\text{clean}}$ to the prompt set.
+          \EndIf
+          \State Sample $(k - \mathbf{1}_{\textit{include\_clean}})$ noisy variants
+                 by composing functions from $\mathcal{N}$ with severity $s$.
+        \EndFor
+        \State Encode all prompts with the text encoder of $M$ and
+               $\ell_{2}$-normalize embeddings.
+        \State Initialize counters: $\textit{correct\_top1} \leftarrow 0$,
+               $\textit{correct\_top5} \leftarrow 0$, $\textit{total} \leftarrow 0$.
+        \For{each mini-batch of images $x$ with labels $y$}
+          \State Extract image features with $M$ and normalize them.
+          \State Compute logits between image features and each class prompt
+                 (using test-time prompt ensembling over $k$ prompts).
+          \State Obtain predicted labels $\hat{y}$ by $\arg\max$ over classes.
+          \State Update top-1 / top-5 accuracy counters.
+        \EndFor
+        \State Compute top-1, top-5, precision, recall, and F1 for this setting.
+        \State Store results as $(D, M, s, k, \textit{include\_clean})$.
+      \EndFor
+    \EndFor
+  \EndFor
+\EndFor
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Loss Function and Optimization} 
+
+
+\textbf{CLIP (Softmax-based Contrastive Loss):}
+CLIP is pre-trained using a symmetric softmax-based contrastive loss that couples all examples within a batch. Given a batch of $N$ image-text pairs $\{(v_i, t_i)\}_{i=1}^{N}$, where $v_i$ and $t_i$ are $\ell_2$-normalized image and text embeddings, the loss function is:
+
+\begin{multline}
+\mathcal{L}_{\text{CLIP}} = -\frac{1}{2N}\sum_{i=1}^{N}\Bigg[\log\frac{\exp(\text{sim}(v_i, t_i)/\tau)}{\sum_{j=1}^{N}\exp(\text{sim}(v_i, t_j)/\tau)} \\
++ \log\frac{\exp(\text{sim}(v_i, t_i)/\tau)}{\sum_{j=1}^{N}\exp(\text{sim}(v_j, t_i)/\tau)}\Bigg]
+\end{multline}
+
+
+
+where $\text{sim}(v, t) = v^\top t$ is the cosine similarity and $\tau$ is a learnable temperature parameter. This objective maximizes similarity for correct pairs while minimizing it for all other pairs in the batch through softmax normalization. The symmetric formulation computes both image-to-text and text-to-image losses.
+
+\textbf{SigLIP (Sigmoid-based Pairwise Contrastive Loss):}
+SigLIP replaces the global softmax normalization with a sigmoid-based pairwise loss that operates independently on each image-text pair. This formulation eliminates the coupling between batch examples:
+
+\begin{equation}
+\mathcal{L}_{\text{SigLIP}} = -\frac{1}{N^2}\sum_{i=1}^{N}\sum_{j=1}^{N}\log\left(\sigma(z_{ij} \cdot \text{sim}(v_i, t_j))\right)
+\end{equation}
+
+where $z_{ij}$ assigns $+1$ to matching image-text pairs (when $i=j$) and $-1$ to non-matching pairs (when $i \neq j$), and $\sigma(\cdot)$ is the sigmoid function. Unlike CLIP's softmax, which normalizes over the entire batch, SigLIP treats each pair independently, potentially leading to different robustness characteristics under distribution shift or noisy inputs.
+
+\textbf{CoOp (Context Optimization):}
+CoOp fine-tunes learnable continuous context vectors while keeping the pre-trained CLIP encoders frozen. For a dataset with $C$ classes and $N$ training samples, CoOp optimizes the context vectors $\mathbf{v} = [v_1, \ldots, v_M]$ using standard cross-entropy loss:
+
+\begin{equation}
+\mathcal{L}_{\text{CoOp}} = -\frac{1}{N}\sum_{i=1}^{N}\log p(y_i | x_i; \mathbf{v})
+\end{equation}
+
+where $p(y_i | x_i; \mathbf{v})$ is the predicted probability for the correct class $y_i$ given image $x_i$ and learned context $\mathbf{v}$.
+
+
+
+\textbf{Noise-Aware Adapter Training}
+
+The adapter is trained using a mixture of clean and noisy prompts with K = 5 prompt ensembling. The model is optimized using the following objective:
+
+\begin{equation}
+L = L_{\text{CE}} + \lambda L_{\text{consistency}} \tag{\cite{ref8}}
+\end{equation}
+
+Where:
+\begin{itemize}
+\item Cross-Entropy (CE) Loss enforces correct classification.
+\item Consistency Loss stabilizes predictions across multiple noisy prompt variants.
+\item $\lambda$ controls the strength of the consistency regularization.
+\end{itemize}
+%We fine-tuned the model using AdamW optimizer, weight-decay regularization, and 5 epochs on the Oxford Pets dataset. This phase investigates whether introducing noise-based regularization techniques can effectively improve the model’s robustness to noisy prompts
+
+\textbf{Optimization Configuration:}
+The adapter parameters are fine-tuned using the AdamW optimizer with the following configuration: learning rate of $1 \times 10^{-4}$, weight decay of $0.01$ for $\ell_2$ regularization, batch size of 32, training for 5 epochs on the Oxford-Pets training split (70\% of data), and consistency regularization weight $\lambda = 0.5$. The cross-entropy (CE) loss enforces correct classification, while the consistency loss stabilizes predictions across multiple noisy prompt variants, with $\lambda$ controlling the strength of the consistency regularization.
+
+\begin{comment}
+In Phase 3, we introduce a noise-aware training strategy for CLIP using lightweight adapter modules. The adapter is trained using a mixture of clean and noisy prompts with $K = 5$ prompt ensembling. The model is optimized using a composite objective that balances classification accuracy with prediction consistency:
+
+\begin{equation}
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CE}} + \lambda \mathcal{L}_{\text{consistency}}
+\label{eq:adapter_loss}
+\end{equation}
+
+where:
+
+\begin{itemize}
+\item \textbf{Cross-Entropy (CE) Loss} $\mathcal{L}_{\text{CE}}$ enforces correct classification using clean prompts. For a training sample $(x, y)$ with clean prompt $t_{\text{clean}}$:
+\begin{equation}
+\mathcal{L}_{\text{CE}} = -\log p(y | x, t_{\text{clean}})
+\end{equation}
+
+\item \textbf{Consistency Loss} $\mathcal{L}_{\text{consistency}}$ stabilizes predictions across multiple noisy prompt variants by minimizing the average Kullback-Leibler (KL) divergence between the clean prompt distribution and noisy prompt distributions:
+\begin{equation}
+\mathcal{L}_{\text{consistency}} = \frac{1}{K-1}\sum_{i=1}^{K-1} D_{\text{KL}}(p(\cdot | x, t_{\text{clean}}) \| p(\cdot | x, t_{\text{noisy}_i}))
+\end{equation}
+where $\{t_{\text{noisy}_1}, \ldots, t_{\text{noisy}_{K-1}}\}$ are independently sampled noisy variants with random noise types and severity levels.
+
+\item \textbf{Regularization strength} $\lambda$ controls the trade-off between maintaining classification accuracy on clean prompts and improving robustness to noisy prompts. Higher $\lambda$ values prioritize consistency at the potential cost of clean accuracy.
+\end{itemize}
+
+\textbf{Optimization Configuration:}
+The adapter parameters are fine-tuned using the AdamW optimizer~\cite{loshchilov2017decoupled} with the following configuration:
+\begin{itemize}
+\item Learning rate: [specify, e.g., $1 \times 10^{-4}$]
+\item Weight decay: [specify, e.g., $0.01$] for $\ell_2$ regularization
+\item Batch size: [specify, e.g., 32]
+\item Training epochs: 5 epochs on the Oxford-Pets training split (70\% of data)
+\item Consistency weight: $\lambda$ = [specify, e.g., 0.5]
+\item Learning rate schedule: [specify if used, e.g., cosine annealing, or "constant"]
+\end{itemize}
+
+Only the adapter parameters are updated during training; the pre-trained CLIP vision and text encoders remain frozen to preserve the rich representations learned from web-scale data. This phase investigates whether introducing noise-based consistency regularization can effectively improve the model's robustness to noisy prompts while maintaining strong performance on clean inputs.
+
+\end{comment}
+
+
+
+
+\section{Experimental Design and Evaluation} 
+\subsection{Datasets and Preprocessing} 
+
+In this study, Five datasets were used: Oxford-IIIT Pets, Caltech-101, Food-101, DTD (Describable Textures Dataset), and EuroSAT (RGB). Each dataset represents a different visual domain. Table~\ref{tab:datasets} summarizes the key details of each dataset.
+
+The following preprocessing techniques were applied:
+\begin{enumerate}
+    \item All datasets were organized into a unified Image Folder format (Dataset $\rightarrow$ Class Label $\rightarrow$ respective images)
+    \item Images were loaded and resized to the appropriate resolution for each model. (384×384 for SigLIP, 224×224 for CLIP \& CoOp).
+    \item Images were converted to tensors and normalized channels using model-specific mean/std before passing to the model.
+\end{enumerate}
+
+
+\begin{table}[t]
+\centering
+\caption{Dataset Overview and Specifications}
+\label{tab:datasets}
+\small
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Dataset} & \textbf{Oxford-IIIT Pets} \cite{petsDS} \\
+\hline
+Domain & Animal \\
+Classes & 37 \\
+Images & 7,349 \\
+Resolution & 300×300+ \\
+Description & Cat \& dog breeds \\
+\hline
+\textbf{Dataset} & \textbf{Caltech-101} \cite{caltechDS} \\
+\hline
+Domain & Objects \\
+Classes & 101 \\
+Images & 9,144 \\
+Resolution & 300×200+ \\
+Description & Object categories \\
+\hline
+\textbf{Dataset} & \textbf{Food-101} \cite{foodDS} \\
+\hline
+Domain & Food \\
+Classes & 101 \\
+Images & 101,000 \\
+Resolution & 512×512 \\
+Description & Food recognition \\
+\hline
+\textbf{Dataset} & \textbf{DTD} \cite{dtdDS} \\
+\hline
+Domain & Textures \\
+Classes & 47 \\
+Images & 5,640 \\
+Resolution & 300×300 \\
+Description & Texture attributes \\
+\hline
+\textbf{Dataset} & \textbf{EuroSAT} \cite{eurosatDS} \\
+\hline
+Domain & Satellite \\
+Classes & 10 \\
+Images & 27,000 \\
+Resolution & 64×64 \\
+Description & Land cover \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Performance Metrics} 
+
+%For each mini-batch of images, we extract visual features using the model's image encoder and compute cosine similarity scores between normalized image and text embeddings. Classification predictions are obtained by selecting the class with maximum averaged similarity score across its prompt ensemble. We track the following metrics:
+
+To evaluate the robustness of CLIP, SigLIP, and CoOp under noisy prompts, this study uses the following metrics:
+
+
+\textbf{Top-1 Accuracy (Clean and Noisy)}
+Measures the percentage of test samples for which the predicted label matches the ground truth.
+Accuracy is computed for Clean prompts (baseline) and Noisy prompts at severity levels $s \in \{0,1,2,3\}$
+
+
+\textbf{Absolute Accuracy Drop ($\Delta$)}
+Quantifies the absolute loss in accuracy caused by noisy prompts:
+\[
+\Delta = \text{Acc}_{\text{clean}} - \text{Acc}_{\text{noisy}}
+\]
+
+
+\textbf{Relative Robustness (RR)}
+Measures how much of the clean accuracy is retained under noisy prompts:
+\[
+RR = \left(\frac{\text{Acc}_{\text{noisy}}}{\text{Acc}_{\text{clean}}}\right) \times 100
+\]
+
+
+\textbf{Relative Accuracy Drop (RAD)}
+Commonly used to express noise-induced degradation relative to the clean baseline:
+\[
+RAD = \left(\frac{\text{Acc}_{\text{clean}} - \text{Acc}_{\text{noisy}}}{\text{Acc}_{\text{clean}}}\right) \times 100
+\]
+RR and RAD are complementary metrics:
+\[
+RR = 100 - RAD
+\]
+
+
+\textbf{Test-Time Ensemble Gain ($\Delta_{\text{Ens}}$)}
+Measures how much prompt ensembling improves robustness:
+\[
+\Delta_{\text{Ens}} = \text{Acc}_{\text{ensemble}} - \text{Acc}_{\text{single-prompt}}
+\]
+A positive value indicates robustness improvement due to ensembling.
+
+
+
+
+\subsection{Experiment Setup} 
+
+All experiments were conducted on Google Colab using PyTorch 2.0 with NVIDIA A100 GPUs. The study was organized into three phases. In the first phase, all three VLMs (CLIP, SigLIP, and CoOp) were evaluated on all five datasets—Oxford-IIIT Pets, Caltech-101, Food-101, DTD, and EuroSAT—to establish baseline accuracy for a clean prompt for each model–dataset pair. In the second phase, which aims to evaluate the robustness of the model to noisy prompts using prompt ensembling. Due to computational constraints, CLIP and SigLIP were tested on three datasets: Oxford Pets, DTD, and EuroSAT, and CoOp was tested on Oxford Pets. In the third phase, a noise-aware regularization strategy was applied only to CLIP on the Oxford Pets dataset to investigate whether regularization can enhance robustness on a representative dataset.
+
+\subsection{Results Comparative Analysis} 
+
+\section{Phase 1: Baseline Benchmarking}
+
+In Phase 1, we evaluate the clean-prompt (noise-free) performance of all three vision–language models—CLIP, SigLIP, and CoOp—across all five datasets: Oxford-IIIT Pets, Caltech-101, Food-101, DTD, and EuroSAT to establish the baseline accuracy for each model. 
+
+\begin{table}[h!]
+\centering
+\label{tableBaselineSummary}
+\caption{Phase 1 Baseline Accuracy Under Clean Prompts}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Dataset} & \textbf{CLIP Acc} & \textbf{CoOp Acc} & \textbf{Gain over CLIP} & \textbf{SigLIP Acc} \\
+\hline
+Oxford Pets  & 86.2\% & 91.1\% & +4.9\%  & 78.64\% \\
+Caltech101   & 92.0\% & 93.4\% & +1.4\%  & 74.05\% \\
+Food101      & 78.2\% & 80.0\% & +1.8\%  & --      \\
+DTD          & 38.0\% & 58.5\% & +20.5\% & 49.93\% \\
+EuroSAT      & 22.0\% & 50.2\% & +28.2\% & 40.99\% \\
+\hline
+\end{tabular}
+\end{table}
+
+
+The experimental results summarized in Table~\ref{tableBaselineSummary} show that all models perform well on clean prompts, but their behavior differs across dataset types. CoOp achieves the highest accuracy overall, improving consistently over CLIP across all datasets, with very large gains on high-shift domains such as DTD (+20.5\% AAD, RR = 1.54) and EuroSAT (+28.2\% AAD, RR = 2.28).
+A key observation is that SigLIP performs worse than CLIP on natural-image datasets (Oxford Pets, Caltech101, Food101), showing RR values below 1.0, but significantly outperforms CLIP on the most difficult datasets, achieving +11.9\% AAD (RR = 1.31) on DTD and +18.9\% AAD (RR = 1.86) on EuroSAT. This indicates that SigLIP generalizes better to domains that are very different from web images—such as satellite imagery and texture classification—likely due to its sigmoid-based contrastive training objective.
+Overall, CoOp delivers the best clean-prompt performance, while SigLIP demonstrates superior robustness on datasets with large domain shifts. Figure~\ref{fig:clean_baseline_comparison} presents the baseline accuracy of CLIP, CoOp, and SigLIP models under clean (non-adversarial) prompts across all five datasets.
+
+
+
+\begin{comment}
+In the clean prompt setting. CLIP consistently outperforms SigLIP on almost every dataset, showing stronger and more stable accuracy, especially on Oxford Pets, Caltech101, and Food101. SigLIP performs noticeably weaker and shows larger drops on the more challenging datasets. CoOp, which learns prompts directly from the dataset, achieves the highest accuracy overall. It provides small improvements over CLIP on easier datasets like Pets, Caltech101, and food101, but delivers very large gains on harder datasets such as DTD and EuroSAT. These results show that while CLIP is generally the strongest pre-trained model, CoOp benefits significantly from task-specific prompt learning, and SigLIP lags behind both models in the clean-prompt setting. 
+\end{comment}
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{CleanAccuracy.png}
+\caption{Comparison of clean accuracy across CLIP, CoOp, and SigLIP baseline models on five benchmark datasets.}
+\label{fig:clean_baseline_comparison}
+\end{figure}
+
+
+
+
+% Required packages for this section
+% Add these to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{multirow}
+% \usepackage{graphicx}
+
+\section{Phase 2: Robustness Analysis Under Noisy Prompts}
+
+In Phase 2, we evaluate the sensitivity of the three VLMs to adversarial text perturbations and examine whether test-time prompt ensembling can mitigate performance degradation.
+
+The experimental results summarized in Table~\ref{tab:clip_robustness_full}, Table ~\ref{tab:siglip_robustness}, and Table ~\ref{tab:coop_robustness}  show that
+
+
+\subsection{CLIP Robustness Analysis}
+
+Across all datasets, CLIP results in Table~\ref{tab:clip_robustness_full} show substantial degradation when a single noisy prompt is used, especially at higher severity levels. For example, on Oxford Pets, the accuracy drops from 87.4\% → 25.2\%, corresponding to an Absolute Accuracy Drop (AAD) of –62.2\% and a Relative Accuracy Drop (RAD) of –71.2\%. The model’s Relative Robustness (RR) decreases sharply as severity increases, confirming CLIP’s strong dependence on well-formed textual input. However, test-time prompt ensembling stabilizes performance considerably: at severity 3, K=5+CLEAN reaches 68.8\%, yielding a Test-Time Ensemble Gain (TTEG) of +43.6\%, effectively recovering most of the accuracy lost due to noisy prompts.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig:clip_all_datasets.png}
+\caption{CLIP robustness under noisy prompts across all datasets using K=5+Clean ensemble strategy. Oxford Pets and Food101 demonstrate strong resilience, while DTD and EuroSAT show significant degradation under noise.}
+\label{fig:clip_all_datasets}
+\end{figure}
+
+Figure \ref{fig:clip_all_datasets} shows how CLIP performs under noisy prompts using the K=5+Clean ensemble. Oxford Pets and Food101 remain relatively stable even at high noise levels, dropping only to 68.8\% and 75.0\% at severity 3. In contrast, DTD and EuroSAT degrade sharply (32.8\% and 30.6\%), reflecting their large domain shift from CLIP’s pretraining data. Overall, CLIP is robust on natural-image datasets but highly sensitive on texture and satellite domains when prompts are corrupted.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig:clip_strategies.png}
+\caption{Comparison of CLIP ensemble strategies on Oxford Pets dataset}
+\label{fig:clip_strategies}
+\end{figure}
+
+Figure \ref{fig:clip_strategies} shows that prompt ensembling greatly improves CLIP’s robustness. On Oxford Pets, accuracy at severity 3 increases from 25.2\% (K=1) to 68.8\% (K=5+Clean)—recovering almost all lost performance. The clean prompt in the ensemble provides an additional boost compared to K=5 No Clean, acting as a stable anchor under heavy corruption. Overall, ensembling offers a simple but highly effective defense against noisy prompts.
+
+\subsection{SigLIP Robustness Analysis}
+SigLIP behaves differently than CLIP under noisy prompts (Table ~\ref{tab:siglip_robustness}). While accuracy still drops, SigLIP handles difficult datasets better especially those with unusual images like satellite photos (EuroSAT) or texture patterns (DTD). On EuroSAT at maximum noise, SigLIP reaches 24.2\% accuracy with ensembling compared to CLIP's lower performance. This advantage likely stems from how SigLIP was trained: its loss function creates more flexible predictions, making it better at handling images that look different from typical web photos.
+
+
+\subsection{CoOp Robustness Analysis}
+CoOp, being optimized using learned continuous context vectors. Results in Table~\ref {tab:coop_robustness} show that CoOp remains almost completely unaffected by noisy prompts. Its accuracy stays constant at 91.11\% across all severity levels on Oxford Pets, as shown in Figure~\ref{fig:model_comparison}, giving AAD = 0, RAD = 0, and RR = 1.0, confirming that continuous prompts are inherently more robust to surface-level textual corruption.
+
+
+
+Overall, Phase 2 demonstrates that (1) CLIP is highly sensitive to noisy prompts, (2) SigLIP maintains stronger robustness on out-of-domain datasets, and (3) CoOp is effectively noise-invariant. The metrics clearly show that test-time ensembling consistently improves RR and reduces RAD for CLIP and SigLIP, making it an efficient and lightweight defense against prompt corruption.
+
+% ========== TABLE 1: CLIP COMPREHENSIVE RESULTS ==========
+\begin{table*}[h]
+\centering
+\caption{CLIP Robustness Under Noisy Prompts Across All Datasets and Ensemble Strategies}
+\label{tab:clip_robustness_full}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Strategy} & \textbf{Severity 0} & \textbf{Severity 1} & \textbf{Severity 2} & \textbf{Severity 3} \\
+\midrule
+\multirow{3}{*}{Oxford Pets} 
+    & K=1             & 87.4\% & 62.9\% & 27.6\% & 25.2\% \\
+    & K=5+Clean       & 87.4\% & 84.9\% & 74.5\% & 68.8\% \\
+    & K=5 No Clean    & 87.4\% & 75.2\% & 57.8\% & 34.6\% \\
+\midrule
+\multirow{3}{*}{Food101}     
+    & K=1             & 87.8\% & 62.9\% & 41.8\% & 33.3\% \\
+    & K=5+Clean       & 87.8\% & 81.8\% & 76.2\% & 75.0\% \\
+    & K=5 No Clean    & 87.8\% & 80.5\% & 59.3\% & 48.3\% \\
+\midrule
+\multirow{3}{*}{DTD}         
+    & K=1             & 42.9\% & 26.8\% & 13.5\% & 8.5\%  \\
+    & K=5+Clean       & 42.9\% & 37.5\% & 35.3\% & 32.8\% \\
+    & K=5 No Clean    & 42.9\% & 40.7\% & 21.3\% & 19.2\% \\
+\midrule
+\multirow{3}{*}{EuroSAT}     
+    & K=1             & 35.8\% & 27.3\% & 19.7\% & 18.8\% \\
+    & K=5+Clean       & 35.8\% & 35.6\% & 29.1\% & 30.6\% \\
+    & K=5 No Clean    & 35.8\% & 32.9\% & 23.0\% & 9.4\%  \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+
+
+
+\begin{comment}
+Figure~\ref{fig:clip_all_datasets} illustrates CLIP's performance trajectory across all four datasets using the K=5+Clean ensemble strategy. Oxford Pets and Food101 maintain relatively high accuracy even under severe noise, achieving 68.8\% and 75.0\% respectively at severity level 3. This resilience stems from these datasets' alignment with CLIP's pretraining distribution—both contain common objects with rich textual descriptions in web-crawled data. Conversely, DTD and EuroSAT exhibit substantial vulnerability, with DTD dropping to 32.8\% and EuroSAT to 30.6\% at maximum noise. These texture-based and satellite imagery domains represent significant distribution shifts from CLIP's pretraining corpus, compounding the effects of prompt corruption.
+\end{comment}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig:model_comparison.png}
+\caption{Robustness comparison between CLIP, CoOp, and SigLIP on Oxford Pets dataset. CoOp demonstrates perfect stability across all noise levels (91.11\%), while CLIP shows gradual degradation and SigLIP exhibits improved performance with ensembling.}
+\label{fig:model_comparison}
+\end{figure}
+
+\begin{comment}
+The efficacy of prompt ensembling as a defensive mechanism is 
+\end{comment}
+
+
+
+% ========== TABLE 2: SIGLIP COMPREHENSIVE RESULTS ==========
+\begin{table}[h]
+\centering
+\caption{SigLIP Robustness Under Noisy Prompts Across Three Datasets}
+\label{tab:siglip_robustness}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Strategy} & \textbf{Sev 0} & \textbf{Sev 1} & \textbf{Sev 2} & \textbf{Sev 3} \\
+\midrule
+\multirow{3}{*}{Oxford Pets} 
+    & K=1             & 55.4\% & 47.1\% & 38.5\% & 32.8\% \\
+    & K=5+Clean       & 55.4\% & 60.3\% & 68.9\% & 74.0\% \\
+    & K=5 No Clean    & 55.4\% & 65.7\% & 80.1\% & 74.0\% \\
+\midrule
+\multirow{3}{*}{DTD}         
+    & K=1             & 33.0\% & 24.6\% & 18.1\% & 14.0\% \\
+    & K=5+Clean       & 33.0\% & 35.2\% & 38.7\% & 40.1\% \\
+    & K=5 No Clean    & 33.0\% & 36.5\% & 32.4\% & 28.7\% \\
+\midrule
+\multirow{3}{*}{EuroSAT}     
+    & K=1             & 25.0\% & 20.4\% & 16.8\% & 14.2\% \\
+    & K=5+Clean       & 25.0\% & 26.8\% & 28.3\% & 29.1\% \\
+    & K=5 No Clean    & 25.0\% & 24.6\% & 20.1\% & 11.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% ========== TABLE 3: COOP RESULTS ==========
+\begin{table}[h]
+\centering
+\caption{CoOp Robustness on Oxford Pets Dataset (Perfect Stability)}
+\label{tab:coop_robustness}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Severity 0} & \textbf{Severity 1} & \textbf{Severity 2} & \textbf{Severity 3} \\
+\midrule
+CoOp & 91.11\% & 91.11\% & 91.11\% & 91.11\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\label{AdapterTable}
+\caption{Accuracy Before vs. After Noise-Aware Fine-Tuning on Oxford Pets}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Setting} & \textbf{Severity} & \textbf{Before} & \textbf{After} & \textbf{$\Delta$} \\
+\midrule
+\multirow{4}{*}{K=1 (Single Prompt)} 
+& 0 & 87.35 & 93.24 & +5.89 \\
+& 1 & 29.54 & 68.11 & +38.57 \\
+& 2 & 15.94 & 45.84 & +29.90 \\
+& 3 & 7.00  & 23.79 & +16.79 \\
+\midrule
+\multirow{4}{*}{K=5 + Clean}
+& 0 & 87.41 & 93.24 & +5.83 \\
+& 1 & 84.98 & 92.75 & +7.77 \\
+& 2 & 74.49 & 90.68 & +16.19 \\
+& 3 & 68.85 & 85.83 & +16.98 \\
+\midrule
+\multirow{4}{*}{K=5 No Clean}
+& 0 & 87.41 & 93.24 & +5.83 \\
+& 1 & 75.20 & 91.44 & +16.24 \\
+& 2 & 57.84 & 87.35 & +29.52 \\
+& 3 & 34.61 & 75.36 & +40.75 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+
+% ===============================
+% Figure 6 — K=1 (single prompt)
+% ===============================
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{fig6.png}
+    \caption{\textbf{K=1 (single prompt per class).} 
+    Noise severely degrades the baseline CLIP model, dropping from 87.35\% to 7.00\% at severity~3. 
+    Noise-aware fine-tuning significantly improves robustness, raising severity-3 accuracy to 23.79\% (+16.79 points).}
+    \label{fig:phase3_k1}
+\end{figure}
+
+% ===============================
+% Figure 7 — K=5 with CLEAN+4 noisy
+% ===============================
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{Fig7.png}
+    \caption{\textbf{K=5 with CLEAN + 4 NOISY prompts (ensembling).} 
+    Ensembling stabilizes CLIP under noise, and the adapter further enhances robustness. 
+    Accuracy at severity~3 increases from 68.85\% to 85.83\% after fine-tuning (+16.98 points).}
+    \label{fig:phase3_k5_clean}
+\end{figure}
+
+% ===============================
+% Figure 8 — K=5 all NOISY (no clean)
+% ===============================
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{fig8.png}
+    \caption{\textbf{K=5 all NOISY prompts (no clean).} 
+    This setting is the hardest for CLIP: accuracy drops to 34.61\% at severity~3 without adaptation. 
+    Noise-aware fine-tuning provides the largest improvement, boosting severity-3 accuracy to 75.36\% (+40.75 points).}
+    \label{fig:phase3_k5_no_clean}
+\end{figure}
+
+\section{Phase 3: Noise-Aware Fine-Tuning}
+
+Noise-aware adapter training produced a substantial improvement in CLIP’s robustness across all prompt configurations, as shown in Table ~\ref{AdapterTable}  . Under the most fragile setting (K=1 single-prompt inference), accuracy at severity level 3 increased from 7.0\% to 23.79\% (+16.79), with even larger gains at moderate noise (e.g., +38.57 at severity 1). When using prompt ensembling with a clean prompt (K=5+Clean), performance became significantly more stable, with accuracy at severity 3 improving from 68.85\% to 85.83\% (+16.98) and mid-severity levels showing gains of +7.77 to +16.19 points. The strongest effect appears in the K=5 No-Clean condition: without fine-tuning, accuracy collapsed to 34.61\% at severity 3, but the noise-aware adapter lifted this to 75.36\% (+40.75), nearly matching the clean-prompt ensemble. These results show that noise-aware fine-tuning dramatically reduces the Relative Accuracy Drop across all noise levels, increases Relative Robustness by preserving 80–92\% of clean accuracy under severe corruption, and turns CLIP’s previously unstable behavior under noisy prompts into a consistently resilient representation—especially when no clean prompt is available.
+
+Figure~\ref{fig:phase3_k1},Figure~\ref{fig:phase3_k5_clean} , and Figure~\ref{fig:phase3_k5_no_clean},  illustrate the impact of noise-aware fine-tuning across different prompting strategies. With K=1 Figure~\ref{fig:phase3_k1}, CLIP collapses under noise, falling to only 7\% accuracy at severity 3, but the adapter significantly restores performance (+16.79 points). When using K=5 ensembling Figure~\ref{fig:phase3_k5_clean}, the model becomes more stable, and fine-tuning further improves robustness—boosting severity-3 accuracy from 68.85\% to 85.83\% with a clean prompt, and from 34.61\% to 75.36\% when all prompts are noisy Figure~\ref{fig:phase3_k5_no_clean}. These results show that the proposed adapter not only strengthens CLIP under moderate corruption but provides especially large benefits when noise is severe or when ensembles lack a clean prompt.
+
+
+
+
+
+
+
+\section{Ablation Study}
+
+To understand how each component contributes to our approach, we tested three test time ensembling strategies: (1) K=1 (single noisy prompt), (2) K=5+Clean (one clean prompt plus four noisy ones), and (3) K=5 No Clean (five noisy prompts). This helps us see the separate effects of prompt ensembling and our noise-aware adapter from Phase 3.
+
+\textbf{Single Prompt (K=1).} Single-prompt inference shows how sensitive the model is to noise. As shown in Fig.~\ref{fig:phase3_k1}, accuracy drops sharply as noise increases from 87.35\% at severity 0 to 7.00\% at severity 3 (maximum noise). After applying our adapter, performance improves significantly.
+
+\textbf{K=5+Clean (One Clean + Four Noisy).} Next, we test the K=5+Clean strategy (Fig.~\ref{fig:phase3_k5_clean}). Before fine-tuning, this approach already handles noise well because the clean prompt provides a stable reference. After adding the adapter, the model becomes even more robust maintaining 92.75\%, 90.68\%, and 85.83\% accuracy at severity levels 1–3 respectively.
+
+\textbf{K=5 No Clean (All Noisy).} Finally, we test whether the model can stay robust without any clean prompt (Fig.~\ref{fig:phase3_k5_no_clean}). This is more challenging, but the adapter still delivers large improvements. At severity 3, accuracy increases from 34.61\% to 75.36\% (+40.75 percentage points). 
+
+\textbf{Summary.} Figure~\ref{fig:ablation_ft} shows how ensembling greatly improves robustness, and how our noise-aware adapter further enhances these gains. The combination of both strategies achieves the best results across all noise levels.
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{Ablation.png}
+    \caption{
+        Impact of test-time ensembling and noise-aware fine-tuning on CLIP
+    }
+    \label{fig:ablation_ft}
+\end{figure}
+
+\section{Extended Contributions} 
+
+ This work tackles a practical problem: AI vision systems break when people make normal typing mistakes. In real life, users misspell words, forget spaces, use emojis, or type in ALL CAPS. However, most AI models expect perfect input. We show that a simple technique called prompt ensembling makes these systems much more reliable without needing to retrain expensive models. This makes AI more robust at reasonable cost. For example,using prompt ensembling, we improved CLIP’s accuracy from 25\% to 69\% on corrupted prompts. Additionally, training the model with noisy prompts improves CLIP’s performance even further. For example, experiments show that accuracy at severity level 3 increased from 7.0\% to 23.79\% (+16.79 percentage points), and at severity 1 increased by 38.57\%.
+
+
+
+\section{Conclusion and Future Work} 
+This study builds a noise bank to evaluate how VMLs perform under noisy prompts using both ensebmling strategy and training the model with noisy prompt using regularization. We evaluated CLIP, SigLIP, and CoOp across five datasets and discovered that: CLIP and SigLIP are highly sensitive to noisy prompts. While CoOp show more robustness. CLIP’s accuracy drops significantly under noisy prompts and test-time prompt ensembling recovers most of this lost performance without any retraining. Second, CoOp demonstrated perfect robustness (91.11\% accuracy across all noise levels) while SigLIP showed better stability than CLIP on challenging datasets. Additionally, Our noise- aware fine-tuning approach provided additional gains of 16- 41\% at high noise levels, demonstrating that training the model with noise can enhance its robustness to noisy prompts. 
+
+As a future work for this research. First, testing addi- tional VLM architectures like BLIP and LLaVA would reveal whether our findings generalize to other models. Second, exploring more noise types such as grammatical errors would build a more comprehensive robustness benchmark.
+
+
+
+
+\section{References} 
+\begin{thebibliography}{99}
+
+    \bibitem{ref1} Z. Li, X. Wu, H. Du, F. Liu, H. Nghiem, and G. Shi, ``A Survey of State of the Art Large Vision Language Models: Alignment, Benchmark, Evaluations and Challenges,'' 2025. [Online]. Available: http://arxiv.org/abs/2501.02189
+
+    \bibitem{ref2} A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, ``Modeling Variants of Prompts for Vision-Language Models,'' 2025. [Online]. Available: http://arxiv.org/abs/2503.08229
+
+    \bibitem{ref3} K. Zhou, J. Yang, C. C. Loy, and Z. Liu, ``Learning to Prompt for Vision-Language Models,'' \textit{Int. J. Comput. Vis.}, vol. 130, no. 9, pp. 2337–2348, 2022.
+
+    \bibitem{ref4} X. Zhai et al., ``Sigmoid Loss for Language Image Pre-Training,'' in \textit{Proc. IEEE/CVF International Conference on Computer Vision (ICCV)}, 2023, pp. 11975–11986.
+
+    \bibitem{ref5} J. Zhang, J. Huang, S. Jin, and S. Lu, ``Vision-Language Models for Vision Tasks: A Survey,'' \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, 2023, pp. 1–24.
+
+    \bibitem{ref6} Q. Ye, M. Axmed, R. Pryzant, and F. Khani, ``Prompt Engineering a Prompt Engineer,'' 2024, pp. 355–385.
+
+    \bibitem{ref7} Z. Li, B. Peng, P. He, and X. Yan, ``Evaluating the Instruction-Following Robustness of Large Language Models to Prompt Injection,'' 2024, pp. 557–568.
+
+    \bibitem {ref8} Q. Xie, Z. Dai, E. Hovy, M. Luong, and Q. V Le, “Unsupervised Data Augmentation for Consistency Training,” no. NeurIPS, pp. 1–13, 2020.
+
+    \bibitem{petsDS}
+    O.~M. Parkhi, A.~Vedaldi, A.~Zisserman, and C.~V. Jawahar,
+    ``Cats and dogs,''
+    in \textit{IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 2012.
+    Available: \url{https://www.robots.ox.ac.uk/~vgg/data/pets/}
+    
+    \bibitem{caltechDS}
+    L.~Fei-Fei, R.~Fergus, and P.~Perona,
+    ``Learning generative visual models from few training examples: An incremental Bayesian approach tested on 101 object categories,''
+    in \textit{2004 Conference on Computer Vision and Pattern Recognition Workshop}, 2004, pp. 178--178.
+    Available: \url{https://data.caltech.edu/records/mzrjq-6wc02}
+    
+    \bibitem{foodDS}
+    L.~Bossard, M.~Guillaumin, and L.~Van Gool,
+    ``Food-101 -- mining discriminative components with random forests,''
+    in \textit{European Conference on Computer Vision (ECCV)}, 2014, pp. 446--461.
+    Available: \url{https://www.kaggle.com/datasets/dansbecker/food-101}
+    
+    \bibitem{dtdDS}
+    M.~Cimpoi, S.~Maji, I.~Kokkinos, S.~Mohamed, and A.~Vedaldi,
+    ``Describing textures in the wild,''
+    in \textit{IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 2014, pp. 3606--3613.
+    Available: \url{https://www.robots.ox.ac.uk/~vgg/data/dtd/}
+    
+    \bibitem{eurosatDS}
+    P.~Helber, B.~Bischke, A.~Dengel, and D.~Borth,
+    ``EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification,''
+    \textit{IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing}, vol. 12, no. 7, pp. 2217--2226, 2019.
+    Available: \url{https://github.com/phelber/eurosat}
+    
+\end{thebibliography}
+
+
+\end{document}
