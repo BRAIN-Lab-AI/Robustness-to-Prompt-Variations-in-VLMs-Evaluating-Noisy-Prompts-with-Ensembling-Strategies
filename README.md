@@ -73,15 +73,25 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 [2] A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, “Modeling Variants of Prompts for Vision-Language Models,” 2025. [Online]. Available: http://arxiv.org/abs/2503.08229
 
 [3] K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Learning to Prompt for Vision- Language Models,” Int. J. Comput. Vis., vol. 130, no. 9, pp. 2337–2348,2022.
+
 [4] X. Zhai et al., “Sigmoid Loss for Language Image Pre-Training,” in Proc. IEEE/CVF International Conference on Computer Vision (ICCV), 2023, pp. 11975–11986.
+
 [5] J. Zhang, J. Huang, S. Jin, and S. Lu, “Vision-Language Models for Vision Tasks: A Survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence, 2023, pp. 1–24.
+
 [6] Q. Ye, M. Axmed, R. Pryzant, and F. Khani, “Prompt Engineering a Prompt Engineer,” 2024, pp. 355–385.
+
 [7] Z. Li, B. Peng, P. He, and X. Yan, “Evaluating the Instruction-Following Robustness of Large Language Models to Prompt Injection,” 2024, pp.557–568.
+
 [8] Q. Xie, Z. Dai, E. Hovy, M. Luong, and Q. V Le, “Unsupervised Data Augmentation for Consistency Training,” no. NeurIPS, pp. 1–13, 2020.
+
 [9] O. M. Parkhi, A. Vedaldi, A. Zisserman, and C. V. Jawahar, “Cats and dogs,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2012. Available: https://www.robots.ox.ac.uk/∼vgg/data/pets/
+
 [10] L. Fei-Fei, R. Fergus, and P. Perona, “Learning generative visual models from few training examples: An incremental Bayesian approach tested on 101 object categories,” in 2004 Conference on Computer Vision and Pattern Recognition Workshop, 2004, pp. 178–178. Available: https://data.caltech.edu/records/mzrjq-6wc02
+
 [11] L. Bossard, M. Guillaumin, and L. Van Gool, “Food-101 – mining discriminative components with random forests,” in European Conference on Computer Vision (ECCV), 2014, pp. 446–461. Available: https://www.kaggle.com/datasets/dansbecker/food-101
+
 [12] M. Cimpoi, S. Maji, I. Kokkinos, S. Mohamed, and A. Vedaldi, “Describing textures in the wild,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2014, pp. 3606–3613. Available:https://www.robots.ox.ac.uk/∼vgg/data/dtd/
+
 [13] P. Helber, B. Bischke, A. Dengel, and D. Borth, “EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 12, no. 7, pp. 2217–2226, 2019. Available:https://github.com/phelber/eurosat
 
 
