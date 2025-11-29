@@ -14,7 +14,7 @@ that these models give high accuracy with clean prompts as illustrated in Figure
 
 
 <p align="center">
- <img  align="center" alt="image" src="https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png?raw=true" />
+ <img  align="center" alt="image"  width="400" height="400" src="https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png?raw=true" />
   <br>
   <em>Fig. 1. Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets). Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c).</em>
 </p>
@@ -40,7 +40,7 @@ This limits their usability in noisy, multilingual, or user-generated contexts, 
  The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
 
 <p align="center">
- <img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b"  width="200" height="200"/>
+ <img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b"  width="400" height="400"/>
   <br>
   <em>Figure 1: Impact of different prompt templates on zero-shot CLIP [2].</em>
 </p>
