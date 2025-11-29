@@ -97,8 +97,8 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 # Project Metadata
 
 ### Project Documents
-- **Presentation:** [Project Presentation](/presentation.pptx)
-- **Report:** [Project Report](/report.pdf)
+- **Presentation:** [Project Presentation](/docs/presentation.pptx)
+- **Report:** [Project Report](/docs/report.pdf)
 
 ### Reference Paper
 - [Learning to Prompt for Vision-Language Models](https://dl.acm.org/doi/10.1007/s11263-022-01653-1)
