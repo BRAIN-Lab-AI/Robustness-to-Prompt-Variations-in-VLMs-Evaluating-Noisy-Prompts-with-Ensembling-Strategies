@@ -1,7 +1,6 @@
 # Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies
 
-## Project Metadata
-### Authors
+## Authors
 - **Team:** Aishah Altamimi
 - **Supervisor Name:** Dr. Muzammil Behzad
 - **Affiliations:** KFUPM, IAU
@@ -95,7 +94,7 @@ Thus, the main objective of this project is, first, to **reproduce baseline perf
 [13] P. Helber, B. Bischke, A. Dengel, and D. Borth, “EuroSAT: A novel dataset and deep learning benchmark for land use and land cover classification,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 12, no. 7, pp. 2217–2226, 2019. Available:https://github.com/phelber/eurosat
 
 
-# THE FOLLOWING IS SUPPOSED TO BE DONE LATER
+# Project Metadata
 
 ### Project Documents
 - **Presentation:** [Project Presentation](/presentation.pptx)
