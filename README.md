@@ -285,6 +285,8 @@ The final step compares robustness performance across:
 - **CoOp** (perfect robustness)
 - **CLIP + Adapter** (noise-aware fine-tuning)
 
+
+
 ---
 
 
@@ -458,7 +460,12 @@ python coop_noise_eval_min_v5.py \
 ```
 
 This show how to run each model with oxford_pets dataset. For other datasets only change the dataset name
-  
+
+
+# Results**
+
+
+
 # Project Structure
 
 ```
