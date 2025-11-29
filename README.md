@@ -316,6 +316,7 @@ The final step compares robustness performance across:
     ```
 
 3. **Set Up CoOp and Dassl (Required for CoOp Evaluation)**
+   ```bash
   3.1 Clone repositories
    git clone https://github.com/KaiyangZhou/CoOp.git
    git clone https://github.com/KaiyangZhou/Dassl.pytorch.git
@@ -328,13 +329,15 @@ The final step compares robustness performance across:
 
   3.3 Verify Dassl installation
   python -c "import dassl; print('Dassl installed successfully')"
-
+  ```
 4. **download SigLIP Model**
+```bash
    !pip install -q transformers accelerate timm
 
    from transformers import AutoProcessor, AutoModel
    processor = AutoProcessor.from_pretrained("google/siglip-so400m-patch14-384")
    model = AutoModel.from_pretrained("google/siglip-so400m-patch14-384")
+```
 
 5. **Datasets**
    This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets.  
