@@ -21,9 +21,10 @@ Recent advances in vision–language models (VLMs) include Contrastive Language�
 
 ## Problem Statement
 <p align="justify">
- Studies show that VLMs such as CLIP achieve high accuracy with carefully engineered prompts; however, they are highly sensitive to the way people craft the prompt (wording + structure). Which means accuracy can change a lot based on how the text input is phrased [3]. For example, “a photo of a cat” and “an image of the cat” both have the same meaning however, these variations can result in significant performance differences. Also, adding articles, using synonyms, adding context like “in the wild”, “at night”, or changing word order. All of these can be treated differently by these models.
+Studies show that VLMs such as CLIP can achieve high accuracy when prompts are carefully crafted. However, these models are highly sensitive to how the prompt is written—both its wording and structure. This means that accuracy can change significantly based on small variations in the text input [3].
+For example, the prompts “a photo of a cat” and “an image of the cat” have the same meaning, yet the model may treat them very differently. Even minor changes—such as adding an article, using synonyms, inserting context (e.g., “in the wild”, “at night”), or altering word order—can lead to noticeable differences in predictions.
 
-This limits their usability in noisy, multilingual, or user-generated contexts, which are common real-world situations where user prompts often include noise, typos, or informal expressions.
+Because of this sensitivity, the practical usability of VLMs becomes limited in real-world settings, where user prompts often contain typos, informal phrasing, inconsistent casing, emojis, or multilingual expressions. Such noisy or imperfect inputs can cause substantial performance degradation, raising concerns about the robustness and reliability of these models under noisy prompts.
 </p>
 
 
@@ -58,15 +59,19 @@ This leads to these research Questions:
 
 **RQ1: How sensitive is CLIP, SigLIP & CoOp to noisy prompts?**
 
-**RQ2: Does prompt ensembling improve robustness consistently?**
+**RQ2: How do the models’ training objectives—CLIP’s softmax, SigLIP’s sigmoid, and CoOp’s learnable prompt tokens—shape their robustness and performance across natural-image datasets and out-of-distribution domains (e.g., textures and satellite images)?**
+
+**RQ3: Does prompt ensembling improve robustness consistently?**
 
 
-Thus, the main objective of this project is, first, to **reproduce baseline performance** by establishing clean accuracy for CLIP,SigLIP and CoOp models using the OxfordPets dataset, saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will **develop a standardized noise benchmark** by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will **evaluate the sensitivity of CLIP,SigLIP and CoOp to prompt noise** by measuring accuracy when prompts contain different levels of noise—this directly answers the first research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will **propose a robustness mitigation using ensembling**, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=1, K=5). This will be done by constructing K prompt variants for each class (e.g., one clean + K−1 noisy/paraphrased). For each image, the model will be run and evalauted across all prompts usind 5 benchmark datasets. This will answer the second research question, showing whether prompt ensembling improves the robustness of VLMs consistently.
+Thus, the main objective of this project is, first, to **reproduce baseline performance** by establishing clean accuracy for CLIP,SigLIP and CoOp models using five benchmark datasets: Oxford-IIIT Pets, Caltech-101, Food-101, DTD (Describable Textures Dataset),and EuroSAT (RGB) saving trained checkpoints, and reporting Top-1 accuracy (what is already done in the paper). Next, will **develop a standardized noise benchmark** by implementing noise functions such as typo, random_case, extra_space, and emoji_tail, while defining severity levels (s=0 clean; s=1 low; s=2 medium; s=3 high). Building on this, the project will **evaluate the sensitivity of CLIP,SigLIP and CoOp to prompt noise** by measuring accuracy when prompts contain different levels of noise—this directly answers the first and second research question and shows how much accuracy is affected when the prompt is noisy. Then, the project will **propose a robustness mitigation using ensembling**, during test-time (without retraining) as a low-cost robustness strategy. Specifically, accuracy will be evaluated at noise levels s=1/2/3 using different ensemble sizes (K=1, K=5 (4 noisy & 1 clean), and k=5 (all noisy)). This will be done by constructing K prompt variants for each class. For each image, the model will be run and evaluated across all prompts using 5 benchmark datasets. This will address the second research question, examining whether prompt ensembling consistently improves the robustness of VLMs. Finaly, 
 </p>
 
 ## References
 [1] Z. Li, X. Wu, H. Du, F. Liu, H. Nghiem, and G. Shi, “A Survey of State of the Art Large Vision Language Models: Alignment, Benchmark, Evaluations and Challenges,” 2025. [Online]. Available: http://arxiv.org/abs/2501.02189
+
 [2] A. Li, Z. Liu, X. Li, J. Zhang, P. Wang, and H. Wang, “Modeling Variants of Prompts for Vision-Language Models,” 2025. [Online]. Available: http://arxiv.org/abs/2503.08229
+
 [3] K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Learning to Prompt for Vision- Language Models,” Int. J. Comput. Vis., vol. 130, no. 9, pp. 2337–2348,2022.
 [4] X. Zhai et al., “Sigmoid Loss for Language Image Pre-Training,” in Proc. IEEE/CVF International Conference on Computer Vision (ICCV), 2023, pp. 11975–11986.
 [5] J. Zhang, J. Huang, S. Jin, and S. Lu, “Vision-Language Models for Vision Tasks: A Survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence, 2023, pp. 1–24.
