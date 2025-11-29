@@ -40,7 +40,7 @@ This limits their usability in noisy, multilingual, or user-generated contexts, 
  The study in the “Learning to Prompt for Vision-Language Models” paper [3] illustrates the limitation of the CLIP model, in which its accuracy strongly depends on prompt templates, and even small wording changes can noticeably impact predictions, as shown in Figure 1.
 
 <p align="center">
- <img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b" />
+ <img  align="center" alt="image" src="https://github.com/user-attachments/assets/39018743-bb75-4840-bf7b-e49786e9159b"  width="400" height="250"/>
   <br>
   <em>Figure 1: Impact of different prompt templates on zero-shot CLIP [2].</em>
 </p>
