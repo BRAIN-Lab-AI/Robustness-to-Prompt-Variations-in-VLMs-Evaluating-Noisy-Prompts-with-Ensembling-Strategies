@@ -317,18 +317,18 @@ The final step compares robustness performance across:
 
 3. **Set Up CoOp and Dassl (Required for CoOp Evaluation)**
    ```bash
-  3.1 Clone repositories
-   git clone https://github.com/KaiyangZhou/CoOp.git
-   git clone https://github.com/KaiyangZhou/Dassl.pytorch.git
-
-  3.2 Install Dassl
-   cd Dassl.pytorch
-   pip install -r requirements.txt
-   pip install -e .    # Important: installs Dassl in editable mode
-   cd ..
-
-  3.3 Verify Dassl installation
-  python -c "import dassl; print('Dassl installed successfully')"
+      3.1 Clone repositories
+       git clone https://github.com/KaiyangZhou/CoOp.git
+       git clone https://github.com/KaiyangZhou/Dassl.pytorch.git
+    
+      3.2 Install Dassl
+       cd Dassl.pytorch
+       pip install -r requirements.txt
+       pip install -e .    # Important: installs Dassl in editable mode
+       cd ..
+    
+      3.3 Verify Dassl installation
+      python -c "import dassl; print('Dassl installed successfully')"
   ```
 4. **download SigLIP Model**
 ```bash
