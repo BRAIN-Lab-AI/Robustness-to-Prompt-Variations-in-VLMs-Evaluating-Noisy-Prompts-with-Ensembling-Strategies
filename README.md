@@ -12,7 +12,7 @@ Recent advances in vision–language models (VLMs) include Contrastive Language�
 
 
 <p align="center">
- <img  align="center" alt="image"  width="300" height="400" src="https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/Fig1.png?raw=true" />
+ <img  align="center" alt="image"  width="300" height="400" src="https://github.com/BRAIN-Lab-AI/Robustness-to-Prompt-Variations-in-VLMs-Evaluating-Noisy-Prompts-with-Ensembling-Strategies/blob/main/assets/Fig1.png?raw=true" />
   <br>
   <em>Fig. 1. Illustration of how noisy prompts affect VLMs on the Birman class (Oxford Pets). Clean prompt = correct (a), noisy prompt = incorrect (b), ensembling recovers accuracy (c).</em>
 </p>
@@ -475,7 +475,7 @@ Robustness-to-Prompt-Variations-in-VLMs/
 ├── docs/                                       # Documentation and reports
 │   ├── report.pdf                             # Research report
 │   ├── presentation.pptx                      # Presentation slides
-│   └── main.tex                               # LaTeX source (optional)
+│   └── main.tex                               # LaTeX source 
 │
 ├── notebooks/                                  # Jupyter notebooks
 │   └── VLMs_Robustness.ipynb                  # Analysis and experiments
@@ -485,7 +485,7 @@ Robustness-to-Prompt-Variations-in-VLMs/
 │
 ├── README.md                                   # Main documentation
 ├── requirements.txt                            # Python dependencies
-└── LICENSE                                     # MIT License
+└── LICENSE                                     # License
 ```
 
 ## Acknowledgments
