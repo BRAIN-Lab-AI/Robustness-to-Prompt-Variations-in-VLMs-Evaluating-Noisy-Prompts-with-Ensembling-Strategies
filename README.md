@@ -301,9 +301,18 @@ The final step compares robustness performance across:
 2. **Set Up the Environment:**
     Create a virtual environment and install the required dependencies.
     ```bash
+   # Create virtual environment
    python3 -m venv venv
    source venv/bin/activate      # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+
+  # Install PyTorch and basic dependencies
+  pip install torch torchvision tqdm
+
+# Install CLIP
+pip install git+https://github.com/openai/CLIP.git
+
+# Install SigLIP dependencies
+pip install transformers accelerate timm
     ```
 
 3. **Datasets**
