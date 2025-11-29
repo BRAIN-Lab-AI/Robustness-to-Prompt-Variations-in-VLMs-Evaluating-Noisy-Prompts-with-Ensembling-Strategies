@@ -369,8 +369,46 @@ The final step compares robustness performance across:
      Caltech-101:
      https://data.caltech.edu/records/20086
     ```
-   
-3. **Evaluate CLIP (Clean or Noisy Prompts):**
+
+6. **Produce Baseline Accuracy for CLIP** Note: You need to do the same for other datasets by changing the dataset path
+   ```bash
+   !python train.py \
+   --config-file configs/datasets/dtd.yaml \
+   --eval-only \
+   TRAINER.NAME "ZeroshotCLIP" \
+   MODEL.BACKBONE.NAME "ViT-B/16" \
+   DATASET.ROOT "/content/drive/MyDrive/DL_CoOp_Robustness10/data/dtd"
+   ```
+
+7. **Produce Baseline Accuracy for CoOp** Note: You need to do the same for other datasets by changing the dataset path
+   ```bash
+    !python train.py \
+      --config-file configs/datasets/food101.yaml \
+      TRAINER.NAME "CoOp" \
+      TRAINER.COOP.N_CTX 16 \
+      TRAINER.COOP.CSC False \
+      TRAINER.COOP.CLASS_TOKEN_POSITION "end" \
+      TRAINER.COOP.PREC "fp32" \
+      DATASET.ROOT "/content/drive/MyDrive/DL_CoOp_Robustness10/data/food101" \
+      DATASET.NUM_SHOTS 16 \
+      MODEL.BACKBONE.NAME "ViT-B/16" \
+      OUTPUT_DIR "output/CoOp_ViTB16_Food101_s16_baseline"
+   ```
+
+8. **Produce Baseline Accuracy for SigLIP** Note: You need to do the same for other datasets by changing the dataset path
+   ```bash
+    res_caltech = run_siglip_on_imagefolder(
+        dataset_name="caltech101",
+        base_root="/content/drive/MyDrive/DL_CoOp_Robustness10/data/caltech101/caltech-101/101_ObjectCategories",
+        model_id="google/siglip-so400m-patch14-384",
+        batch_size=128,
+    )
+    
+    print("Top-1:", res_caltech["top1"])
+    print("Top-5:", res_caltech["top5"])
+   ```
+
+9. **Evaluate CLIP (Clean or Noisy Prompts):**
  ```bash
 python prompt_noise_eval_v4.py \
   --dataset_name oxford_pets \
@@ -382,7 +420,7 @@ python prompt_noise_eval_v4.py \
 ```
 
 
-4. **Evaluate SigLIP:**
+10. **Evaluate SigLIP:**
 ```bash
 python prompt_noise_eval_siglip.py \
   --dataset_name oxford_pets \
@@ -391,7 +429,7 @@ python prompt_noise_eval_siglip.py \
   --prompt_noises typo,case,space,emoji \
   --ensemble_k 5
 ```
-6. **Evaluate CoOp Under Noisy Prompts:**
+11. **Evaluate CoOp Under Noisy Prompts:**
  ```bash
 python coop_noise_eval_min_v5.py \
   --dataset_name oxford_pets \
@@ -400,7 +438,7 @@ python coop_noise_eval_min_v5.py \
   --prompt_noises typo,case,space,emoji \
   --ensemble_k 1
 ```
-7. **Train the Noise-Aware Adapter for CLIP:**
+12. **Train the Noise-Aware Adapter for CLIP:**
  ```bash
    python train_prompt_noise_adapter.py \
   --dataset_name oxford_pets \
@@ -409,7 +447,7 @@ python coop_noise_eval_min_v5.py \
   --severity_list 1,2,3 \
   --prompt_noises typo,case,space,emoji
 ```
-8. **Evaluate CLIP + Adapter (After Training):**
+13. **Evaluate CLIP + Adapter (After Training):**
  ```bash
    python noise_eval.py \
   --dataset_name oxford_pets \
