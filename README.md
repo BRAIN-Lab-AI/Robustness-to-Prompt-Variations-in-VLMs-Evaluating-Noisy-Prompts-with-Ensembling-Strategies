@@ -301,21 +301,42 @@ The final step compares robustness performance across:
 2. **Set Up the Environment:**
     Create a virtual environment and install the required dependencies.
     ```bash
-   # Create virtual environment
+   2.1 Create virtual environment
    python3 -m venv venv
    source venv/bin/activate      # On Windows: venv\Scripts\activate
 
-  # Install PyTorch and basic dependencies
-  pip install torch torchvision tqdm
+   2.2 Install PyTorch and basic dependencies
+   pip install torch torchvision tqdm
 
-# Install CLIP
-pip install git+https://github.com/openai/CLIP.git
+   2.3 Install CLIP
+   pip install git+https://github.com/openai/CLIP.git
 
-# Install SigLIP dependencies
-pip install transformers accelerate timm
+   2.4 Install SigLIP dependencies
+   pip install transformers accelerate timm
     ```
 
-3. **Datasets**
+3. **Set Up CoOp and Dassl (Required for CoOp Evaluation)**
+  3.1 Clone repositories
+   git clone https://github.com/KaiyangZhou/CoOp.git
+   git clone https://github.com/KaiyangZhou/Dassl.pytorch.git
+
+  3.2 Install Dassl
+   cd Dassl.pytorch
+   pip install -r requirements.txt
+   pip install -e .    # Important: installs Dassl in editable mode
+   cd ..
+
+  3.3 Verify Dassl installation
+  python -c "import dassl; print('Dassl installed successfully')"
+
+4. **download SigLIP Model**
+   !pip install -q transformers accelerate timm
+
+   from transformers import AutoProcessor, AutoModel
+   processor = AutoProcessor.from_pretrained("google/siglip-so400m-patch14-384")
+   model = AutoModel.from_pretrained("google/siglip-so400m-patch14-384")
+
+5. **Datasets**
    This project evaluates the robustness of CLIP, SigLIP, and CoOp on five publicly available vision datasets.  
    Below is a brief description of each dataset:
 
