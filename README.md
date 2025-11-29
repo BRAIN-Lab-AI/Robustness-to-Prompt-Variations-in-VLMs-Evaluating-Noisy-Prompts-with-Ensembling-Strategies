@@ -459,6 +459,34 @@ python coop_noise_eval_min_v5.py \
 
 This show how to run each model with oxford_pets dataset. For other datasets only change the dataset name
   
+# Project Structure
+
+```
+Robustness-to-Prompt-Variations-in-VLMs/
+│
+├── scripts/                                    # Evaluation scripts
+│   ├── prompt_noise_eval_v4.py                # CLIP evaluation (all 5 datasets)
+│   ├── prompt_noise_eval_siglip.py            # SigLIP evaluation with noise
+│   ├── siglip_baseline_eval.py                # SigLIP baseline (clean prompts)
+│   ├── coop_noise_eval_min_v5.py              # CoOp evaluation with noise
+│   ├── train_prompt_noise_adapter.py          # Train noise-robust adapter
+│   └── noise_eval.py                          # Noise evaluation utilities
+│
+├── docs/                                       # Documentation and reports
+│   ├── report.pdf                             # Research report
+│   ├── presentation.pptx                      # Presentation slides
+│   └── main.tex                               # LaTeX source (optional)
+│
+├── notebooks/                                  # Jupyter notebooks
+│   └── VLMs_Robustness.ipynb                  # Analysis and experiments
+│
+├── assets/                                     # Images and figures
+│   └── Fig1.png                               # Figures for documentation
+│
+├── README.md                                   # Main documentation
+├── requirements.txt                            # Python dependencies
+└── LICENSE                                     # MIT License
+```
 
 ## Acknowledgments
 - **Open-Source Communities:** We acknowledge the contributions of the PyTorch, Hugging Face, and OpenCLIP communities whose tools enabled this work.
